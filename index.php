@@ -54,6 +54,7 @@
  * NOTE: If you change these, also change the error_reporting() code below
  */
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+	// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
 
 /*
  *---------------------------------------------------------------
@@ -231,9 +232,6 @@ switch (ENVIRONMENT)
 
 	// Path to the front controller (this file) directory
 	define('FCPATH', dirname(__FILE__).DIRECTORY_SEPARATOR);
-
-	// Path to the front controller (this file) directory
-	define('ADMINPATH', dirname(__FILE__).DIRECTORY_SEPARATOR).'admin'.DIRECTORY_SEPARATOR;
 
 	// Name of the "system" directory
 	define('SYSDIR', basename(BASEPATH));
