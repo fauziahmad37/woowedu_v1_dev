@@ -4,6 +4,21 @@
 		opacity: 0.5;
 	}
 
+.swal2-popup .swal-wide-button {
+	background-color: #281B93 !important;
+	width: 100% !important;
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+	color: #fff; 
+	border-radius: 6px; 
+}
+
+	.icon-faild {
+		font-size:40px; 
+		color:#f27474; 
+		margin-bottom:10px;
+	}
 </style>
 
 <section class="explore-section section-padding" id="section_2">
@@ -99,7 +114,7 @@
 					<input type="file" class="form-control" id="lampiran" name="lampiran">
 				</div>
 
-				<p class="text-danger fs-12">* Unggah file tugas anda disini, dengan maksimal Ukuran File 100Mb, Jenis file: Jpg, Png, Pdf, Docx, Xlsx, MP4</p>
+				<p class="text-danger fs-12">* Unggah file tugas anda disini, dengan maksimal Ukuran File 2MB, Jenis file: Jpg, Png, Pdf, Docx, Xlsx, MP4</p>
 
 		
 				<div class="mb-3">
@@ -112,5 +127,34 @@
 
 </section>
 
+<script>
 
+
+	// untuk upload file Maks 2 MB 
+
+document.getElementById('lampiran').addEventListener('change', function () {
+	const file = this.files[0];
+	if (file) {
+		const maxSize = 2 * 1024 * 1024; // 2MB
+		if (file.size > maxSize) {
+			Swal.fire({
+				html: `
+					<div class="icon-faild">&#10060;</div>
+					<h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+					<p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil.</p>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = ""; // reset input
+		}
+	}
+});
+
+	// end upload file 2 MB
+</script>
 

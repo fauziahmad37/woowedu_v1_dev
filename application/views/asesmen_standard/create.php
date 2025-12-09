@@ -245,7 +245,6 @@
 	</div>
 </div>
 <!-- end modal edit jumlah soal -->
-
 <div class="soal-pilihan-ganda-container d-none">
 	<?php $this->load->view('asesmen_standard/create_pilihan_ganda') ?>
 </div>

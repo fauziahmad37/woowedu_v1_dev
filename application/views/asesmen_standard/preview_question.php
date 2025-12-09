@@ -1,7 +1,17 @@
 <style>
-	.form-check-input, .fa-check {
+	.form-check-input,
+	.fa-check {
 		width: 24px !important;
 		height: 24px !important;
+	}
+
+	.box-answer-body {
+		background-color: var(--bs-primary-400);
+	}
+
+	.box-answer-drop {
+		border-style: dashed;
+		border-width: 1px;
 	}
 </style>
 
@@ -77,9 +87,27 @@
 					</div>
 				</div>
 
+				<!-- Pairing Answer -->
+				<section class="d-flex mt-4 rounded-3 pairing-answer bg-primary-600">
+					<div class="m-auto text-center mt-4 bg-primary-600 rounded-3 w-100">
+						<div class="position-relative list-pairing rounded mx-1 justify-content-center bg-primary-600 p-2 row" style="height: 380px;">
+							
+						</div>
+					</div>
+				</section>
+
+				<!-- Drag Drop Answer -->
+				<section class="d-flex mt-4 rounded-3 drag-drop-answer bg-primary-600">
+					<div class="m-auto text-center mt-4 bg-primary-600 rounded-3 w-100">
+						<div class="position-relative list-drag-drop rounded mx-1 justify-content-center bg-primary-600 p-2" style="height: 380px; align-content: center;">
+							
+						</div>
+					</div>
+				</section>
+
 				<section class="d-flex soal-footer bg-primary-600 mt-4 p-4 rounded-3">
 					<div class="title border-end pe-3 text-white">
-						<h5 class="exam-title">Ujian PG</h5>
+						<h5 class="exam-title"><?=$title?></h5>
 						<h6 class="subject-name">Ilmu Pengetahuan Alam</h6>
 					</div>
 					<div class="question-type text-white m-auto ms-3">
@@ -108,7 +136,7 @@
 			</div>
 
 			<div class="modal-body p-5">
-				
+
 			</div>
 		</div>
 	</div>

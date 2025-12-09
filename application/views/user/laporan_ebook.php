@@ -1,4 +1,16 @@
 <style>
+	#v-pills-tab button.nav-link.active {
+		background-color: #D4D1E9;
+		color: var(--bs-primary);
+		font-weight: 600;
+	}
+
+	#v-pills-tab button.nav-link {
+		height: 44px;
+		margin-top: 10px;
+		text-align: left;
+	}
+
 	button.nav-link.active#nav-ebook-saya-tab,
 	button.nav-link.active#nav-riwayat-pembelian-tab,
 	button.nav-link.active#nav-wishlist-tab,
@@ -59,10 +71,10 @@
 <div class="content-laporan-ebook">
 	<nav class="d-flex justify-content-center p-0">
 		<div class="nav nav-tabs w-100" id="nav-tab" role="tablist">
-			<button class="fw-bold nav-link w-25 active" id="nav-ebook-saya-tab" data-bs-toggle="tab" data-bs-target="#nav-ebook-saya" type="button" role="tab" aria-controls="nav-ebook-saya" aria-selected="true"><i class="fa-regular fa-calendar-days h6"></i> Ebook Saya <span class="badge-notif-count"><?=count($ebook_members)?></span></button>
-			<button class="fw-bold nav-link w-25" id="nav-riwayat-pembelian-tab" data-bs-toggle="tab" data-bs-target="#nav-riwayat-pembelian" type="button" role="tab" aria-controls="nav-riwayat-pembelian" aria-selected="false"><i class="fa-solid fa-chalkboard-user h6"></i> Riwayat Pembelian <span class="badge-notif-count"><?=$totalPembelian?></span></button>
-			<button class="fw-bold nav-link w-25" id="nav-wishlist-tab" data-bs-toggle="tab" data-bs-target="#nav-wishlist" type="button" role="tab" aria-controls="nav-wishlist" aria-selected="false"><i class="fa-solid fa-chalkboard-user h6"></i> Wishlist <span class="badge-notif-count"><?=count($wishlists)?></span></button>
-			<button class="fw-bold nav-link w-25" id="nav-keranjang-tab" data-bs-toggle="tab" data-bs-target="#nav-keranjang" type="button" role="tab" aria-controls="nav-keranjang" aria-selected="false"><i class="fa-solid fa-chalkboard-user h6"></i> Keranjang <span class="badge-notif-count">0</span></button>
+			<button class="fw-bold nav-link w-25 active" id="nav-ebook-saya-tab" data-bs-toggle="tab" data-bs-target="#nav-ebook-saya" type="button" role="tab" aria-controls="nav-ebook-saya" aria-selected="true"><i class="fa-regular fa-calendar-days h6"></i> Ebook Saya <span class="badge-notif-count total-buku-saya-count"></span></button>
+			<button class="fw-bold nav-link w-25" id="nav-riwayat-pembelian-tab" data-bs-toggle="tab" data-bs-target="#nav-riwayat-pembelian" type="button" role="tab" aria-controls="nav-riwayat-pembelian" aria-selected="false"><i class="fa-solid fa-chalkboard-user h6"></i> Riwayat Pembelian <span class="badge-notif-count total-riwayat-pembelian-count"><?=$totalPembelian?></span></button>
+			<button class="fw-bold nav-link w-25" id="nav-wishlist-tab" data-bs-toggle="tab" data-bs-target="#nav-wishlist" type="button" role="tab" aria-controls="nav-wishlist" aria-selected="false"><i class="fa-solid fa-chalkboard-user h6"></i> Wishlist <span class="badge-notif-count wishlist-count"></span></button>
+			<button class="fw-bold nav-link w-25" id="nav-keranjang-tab" data-bs-toggle="tab" data-bs-target="#nav-keranjang" type="button" role="tab" aria-controls="nav-keranjang" aria-selected="false"><i class="fa-solid fa-chalkboard-user h6"></i> Keranjang <span class="badge-notif-count cart-count">0</span></button>
 		</div>
 
 	</nav>

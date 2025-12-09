@@ -13,7 +13,7 @@
 </style>
 
 <div class="row mt-3">
-	<div class="col"><img width="150" src="<?= base_url() ?>assets/themes/<?= isset($_SESSION['themes']) ? $_SESSION['themes'] : 'space' ?>/images/logowowedu.png" alt=""></div>
+	<div class="col"><img width="150" src="<?= base_url() ?>assets/themes/<?= isset($_SESSION['themes']) ? $_SESSION['themes'] : 'space' ?>/images/logowoowedu.png" alt=""></div>
 	<div class="col text-end">
 		<span style="font-size: 16px; font-weight: 600; display: block;"><?= $exam_header['title'] ?></span>
 		<span style="font-size: 12px; display: block;"><?= $exam_header['subject_name'] ?> - <?= $exam_header['class_name'] ?></span>
@@ -117,6 +117,7 @@
 				<th>Tgl Mengumpulkan</th>
 				<th>Status</th>
 				<th>Nilai</th>
+				<th>Komentar</th>
 				<th>Aksi</th>
 			</tr>
 		</thead>

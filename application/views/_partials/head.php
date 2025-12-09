@@ -7,6 +7,7 @@
 	<meta name="csrf_name" content="<?= !empty($this->security->get_csrf_token_name()) ? $this->security->get_csrf_token_name() : NULL ?>">
 	<meta name="csrf_token" content="<?= !empty($this->security->get_csrf_hash()) ? $this->security->get_csrf_hash() : NULL ?>">
 	<meta name="x_type_token" content="<?= base64_encode($_SESSION['user_token'].':'.set_token($_SESSION['user_token'])) ?>">
+	<meta name="jwt_token" content="<?= !empty($_SESSION['jwt_token']) ? $_SESSION['jwt_token'] : NULL ?>">
 	<!-- end update naquib 22 maret 2021 -->
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">

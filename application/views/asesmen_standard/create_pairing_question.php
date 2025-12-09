@@ -1,7 +1,6 @@
 <div id="mdl-add-pairing" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
-
             <div class="modal-header px-3">
                 <div class="d-flex">
                     <button type="button" class="btn btn-back active me-3" data-bs-dismiss="modal" data-bs-target="#mdl-add-pairing">
@@ -11,11 +10,18 @@
                         <img src="<?=html_escape(base_url('assets/images/icons/list-radio.svg'))?>">
                         <span class="ms-2 text-body-secondary">Menjodohkan</span>
                     </span>
+
+					<span class="ms-3 btn" style="background-color: #E3E4E8; cursor: default;">
+						Jumlah Soal (<span class="jumlah-soal-current">0</span>/<span class="jumlah-soal-active-max">10</span>)
+					</span>
                 </div>
                 <div class="d-flex ms-auto">
                     <button type="button" class="btn active" id="btn-pairing-config"><i class="bi bi-gear me-2"></i>Pengaturan Jawaban</button>
                     <button type="button" class="btn btn-primary ms-3" id="btn-submit-pairing-question"><i class="bi bi-floppy-fill me-2" ></i>Simpan Data</button>
                 </div>
+
+				
+
             </div>
             <div class="modal-body bg-custom-assesment">
                 <div class="row justify-content-center mt-4">
@@ -25,12 +31,13 @@
                                 <form name="frm-pairing-question" onsubmit="return false">
                                     <div class="row">
                                         <div class="col-4">
+                                            <input type="hidden" name="item-id" />
                                             <label class="d-block rounded border border-white overflow-hidden" for="pairing-file-add" style="height: 150px">
                                                 <div class="d-flex flex-column justify-content-center align-items-center bg-box-container img-file-add-container 
                                                             overflow-hidden h-100">
                                                     <img id="img-addFile-pairing-placeholder" src="<?=base_url('assets/images/icons/image-add-fill.svg')?>" alt="Tambahkan File Pendukung" width="40" height="40">
                                                     <span class="text-white mt-1">Tambahkan gambar pendukung</span>
-                                                </div>
+                                                </div> 
                                                 <div id="img-pairing-preview" class="d-none position-relative h-100 w-100 img-preview">
                                                     <img src="" class="img-fluid h-100 w-100">
                                                     <div class="preview-overlay bg-dark bg-opacity-25 d-flex position-absolute top-0 left-0 h-100 w-100 justify-content-center align-items-center">
@@ -39,6 +46,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                               
                                                 <input type="file" class="d-none" id="pairing-file-add" name="file-add">
                                             </label>
                                         </div>
@@ -73,6 +81,7 @@
                                                                 </div>
                                                                 <img id="q-image-preview-0" class="bg-transparent position-absolute top-0 left-0 h-100 w-100"/>
                                                             </label>
+                                                            <input type="hidden" name="img-name[]" />
                                                             <input type="file" name="q-image[]" class="d-none" id="arahan-image-0"/>
                                                             <input type="text" class="form-control border-none text-white h-100 w-100 input-question" name="input-key[]" placeholder="Ketik Arahan di sini...">
                                                         </div>
@@ -101,6 +110,7 @@
                                                                 </div>
                                                                 <img id="q-image-preview-1" class="bg-transparent position-absolute top-0 left-0 h-100 w-100"/>
                                                             </label>
+                                                            <input type="hidden" name="img-name[]" />
                                                             <input type="file" name="q-image[]" class="d-none" id="arahan-image-1"/>
                                                             <input type="text" class="form-control border-none text-white h-100 w-100 input-question" name="input-key[]" placeholder="Ketik Arahan di sini...">
                                                         </div>
@@ -127,11 +137,8 @@
         </div>
     </div>
 </div>
-
-
 <div id="mdl-pairing-config" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-centered">
-
         <div class="modal-content">
             <div class="modal-header bg-primary" data-bs-theme="dark">
                 <h5 class="modal-title text-white">Pengaturan Jawaban</h5>
@@ -140,7 +147,6 @@
             <div class="modal-body px-1">
                 <div class="d-flex flex-nowrap p-3 w-100 align-items-center overflow-auto">
                     <span class="fs-6 d-inline-block">Nilai Jawaban&nbsp;<i class="bi bi-info-circle-fill"></i></span>
-                    
                     <select class="form-select form-select-sm ms-auto w-25 py-2" id="pairing-config-score">
                         <option value="10">10 Points</option>
                         <option value="20">20 Points</option>
@@ -153,12 +159,80 @@
                         <option value="90">90 Points</option>
                         <option value="100">100 Points</option>
                     </select>
-                </div>
-                    
+                </div>  
             </div>
-           
-
         </div>
     </div>
 </div>
 
+<script>
+
+// untuk foto max 2 mb
+const fileInputs = ['arahan-image-0', 'pairing-file-add'];
+fileInputs.forEach(function (inputId) {
+	const input = document.getElementById(inputId);
+
+	if (input) {
+		input.addEventListener('change', function () {
+			const file = this.files[0];
+			const allowedTypes = [
+				'image/jpeg', 'image/png',
+				'application/pdf',
+				'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				'application/vnd.ms-powerpoint',
+				'audio/mpeg',
+				'video/mp4'
+			];
+
+			if (file) {
+				// Tipe tidak didukung
+				if (!allowedTypes.includes(file.type)) {
+					Swal.fire({
+						html: `
+							<div style="text-align: center;">
+								<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+								<h2 style="margin:0; font-size:1.4em;">Tipe File Tidak Didukung</h2>
+								<p style="margin-top:8px;">Hanya file JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3, dan MP4 yang diperbolehkan.</p>
+							</div>
+						`,
+						showCloseButton: false,
+						showConfirmButton: true,
+						confirmButtonText: 'Upload Ulang',
+						customClass: {
+							confirmButton: 'swal-wide-button'
+						}
+					});
+					this.value = "";
+					return;
+				}
+
+				// Ukuran > 2MB
+				const maxSize = 2 * 1024 * 1024;
+				if (file.size > maxSize) {
+					Swal.fire({
+						html: `
+							<div style="text-align: center;">
+								<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+								<h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+								<p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil atau gunakan tautan.</p>
+							</div>
+						`,
+						showCloseButton: false,
+						showConfirmButton: true,
+						confirmButtonText: 'Upload Ulang',
+						customClass: {
+							confirmButton: 'swal-wide-button'
+						}
+					});
+					this.value = "";
+					return;
+				}
+			}
+		});
+	}
+});
+
+
+	// end max 2 mb
+</script>

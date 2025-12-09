@@ -60,8 +60,8 @@
 		</li>
 		<?php endif ?>
 
-		<!-- JIKA LOGIN SEBAGAI MURID / GURU / KEPSEK -->
-		<?php if($_SESSION['user_level'] == 3 || $_SESSION['user_level'] == 4 || $_SESSION['user_level'] == 6): ?> 
+		<!-- JIKA LOGIN SEBAGAI MURID / GURU / KEPSEK / ORTU -->
+		<?php // if($_SESSION['user_level'] == 3 || $_SESSION['user_level'] == 4 || $_SESSION['user_level'] == 6): ?> 
 		<li class="nav-item pl-4">
 			<a class="nav-link" aria-current="page" href="<?=base_url()?>ebook">
 				<div class="row row-cols-2">
@@ -74,7 +74,7 @@
 				</div>
 			</a>
 		</li>
-		<?php endif ?>
+		<?php // endif ?>
 
 		<!-- JIKA LOGIN SEBAGAI MURID / GURU -->
 		<?php if($_SESSION['user_level'] == 3 || $_SESSION['user_level'] == 4): ?> 

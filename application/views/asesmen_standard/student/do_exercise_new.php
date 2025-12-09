@@ -252,6 +252,10 @@ $theme = isset($_SESSION['themes']) ? $_SESSION['themes'] : 'space';
 	<div class="modal fade" id="logoutExamModal" tabindex="-1" aria-labelledby="logoutExamModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content rounded-4 p-3">
+				<div class="modal-header border-0">
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+
 				<div class="modal-body">
 					<span class="badge bg-danger-subtle rounded-circle p-2 h1">
 						<img src="<?= base_url('assets/images/icons/logout-circle-r-line.svg') ?>" alt="logout" style="width: 50px;">
@@ -262,7 +266,7 @@ $theme = isset($_SESSION['themes']) ? $_SESSION['themes'] : 'space';
 				</div>
 				<div class="text-center">
 					<button type="button" class="btn btn-light border m-2" onclick="logoutExam()">Tinggalkan</button>
-					<button type="button" class="btn btn-danger text-white" data-bs-dismiss="modal">Batalkan</button>
+					<!-- <button type="button" class="btn btn-danger text-white" data-bs-dismiss="modal">Batalkan</button> -->
 				</div>
 			</div>
 		</div>

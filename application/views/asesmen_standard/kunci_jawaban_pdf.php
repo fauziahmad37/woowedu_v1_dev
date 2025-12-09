@@ -33,12 +33,56 @@
 		.question p {
 			margin: 5px 0;
 		}
+
+		.drag-drop-item {
+			display: inline-block;
+			padding: 5px 10px;
+			background-color: #f0f0f0;
+			border-radius: 5px;
+			margin-right: 5px;
+			margin-top: 10px;
+		}
+
+				/* untuk kop surat */
+.kop-surat img {
+  width: 80px;
+  height: auto;
+}
+.kop-text {
+  text-align: center;
+}
+.footer {
+  position: fixed;
+  bottom: -30px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10pt;
+}
+		/* end kop surat */
 	</style>
 </head>
 
 <body>
 
 	<div class="container">
+<table width="100%" style="margin-bottom: 10px;">
+  <tr>
+    <?php if (!empty($logo_base64)) : ?>
+    <td width="80" style="text-align: center;">
+      <img src="<?= $logo_base64 ?>" alt="Logo Sekolah" style="width: 80px;">
+    </td>
+    <?php endif; ?>
+    <td style="text-align: center;">
+      <h2 style="margin: 0;"><?= $sekolah_nama ?></h2>
+      <p style="margin: 0; font-size: 12px;">
+        <?= $sekolah_alamat ?><br>
+        Telp: <?= $sekolah_phone ?>  Email: <?= $sekolah_email ?>
+      </p>
+    </td>
+  </tr>
+</table> 
+<hr style="border: 1px solid #000; margin-top: 10px;">
 		<div class="header">
 			<h3>Kunci Jawaban</h3>
 		</div>
@@ -52,7 +96,7 @@
 				return $base64;
 			}
 			?>
-
+		
 			<?php if (!empty($group_soal)) : ?>
 				<?php foreach ($group_soal as $key => $question) : ?>
 					<div class="group-soal">
@@ -109,6 +153,50 @@
 									</div>
 								<?php endif ?>
 
+								<!-- KONDISI JIKA SOAL PAIRING -->
+								<?php if ($soal['type'] == 5) : ?>
+
+									<table>
+										<tr>
+											<?php
+											$soal_pairing = $soal['pairing'];
+											foreach ($soal_pairing as $key => $val_key) :
+											?>
+												<td style="padding-right: 20px; text-align: center;">
+													<?php if ($val_key['has_image']) : ?>
+														<img src="<?= convert_image_to_base64($this->config->item('admin_path'), $val_key['answer_key']) ?>" width="100">
+													<?php else : ?>
+														<p class="d-inline-block"><?= $val_key['answer_key'] ?></p>
+													<?php endif ?>
+												</td>
+											<?php endforeach ?>
+										</tr>
+
+
+										<tr>
+											<?php
+											$answer_pairing = $soal['pairing'];
+											foreach ($answer_pairing as $key => $val_answer) :
+											?>
+												<td style="padding-right: 20px; text-align: center;">
+													<p class="d-inline-block"><?= $val_answer['answer_value'] ?></p>
+												</td>
+											<?php endforeach ?>
+										</tr>
+									</table>
+								<?php endif ?>
+
+								<!-- KONDISI JIKA SOAL DRAG & DROP -->
+								<?php if ($soal['type'] == 6) : ?>
+									<?php if ($soal['question_file']) : ?>
+										<img class="rounded mt-2" src="<?= convert_image_to_base64($this->config->item('admin_path'), $soal['question_file']) ?>" width="100">
+									<?php endif; ?>
+									<p><?= $soal['question'] ?></p>
+									<?php foreach ($soal['drag_drop'] as $key => $val) : ?>
+										<span class="me-3 drag-drop-item"><i class="fa fa-dot-circle-o me-2"></i><?= $val['answer_correct'] ?></span>
+									<?php endforeach ?>
+								<?php endif ?>
+
 							</div>
 						<?php endforeach; ?>
 					</div>
@@ -120,6 +208,9 @@
 
 	</div>
 
+	<div class="footer">
+		<img src="<?= convert_image_to_base64($this->config->item('admin_path'), 'assets/images/logo/logowoowedu.jpg') ?>" style="margin-top:20px;width:80px;margin-right:10px;">Supported by <a href="https://woowedu.com" target="_blank">woowedu.com</a>
+	</div>
 </body>
 
 </html>

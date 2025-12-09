@@ -10,6 +10,10 @@
                         <img src="<?=html_escape(base_url('assets/images/icons/list-radio.svg'))?>">
                         <span class="ms-2 text-body-secondary">Seret & Lepas</span>
                     </span>
+
+					<span class="ms-3 btn" style="background-color: #E3E4E8; cursor: default;">
+						Jumlah Soal (<span class="jumlah-soal-current">0</span>/<span class="jumlah-soal-active-max">10</span>)
+					</span>
                 </div>
                 <div class="d-flex ms-auto">
                     <button type="button" class="btn d-none active" id="btn-dragdrop-response-answer" role="checkbox" aria-checked="false">
@@ -28,6 +32,7 @@
                         <!-- start card -->
                          <div class="card shadow bg-primary">
                             <form name="frm-add-dragdrop" class="card-body">
+                                <input type="hidden" name="item-dragdrop-id" />
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="d-block rounded border border-white overflow-hidden" for="dragdrop-file-add" style="height: 180px">
@@ -222,6 +227,68 @@
         </div>
     </div>
 </div>
+
+
+<script>
+// untuk foto max 2 mb
+document.getElementById('dragdrop-file-add').addEventListener('change', function () {
+	const file = this.files[0];
+	const allowedTypes = [
+		'image/jpeg', 'image/png',
+		'application/pdf',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/vnd.ms-powerpoint',
+		'audio/mpeg',
+		'video/mp4'
+	];
+
+	if (file) {
+		// Cek tipe file
+		if (!allowedTypes.includes(file.type)) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Tipe File Tidak Didukung</h2>
+						<p style="margin-top:8px;">Hanya file JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3, dan MP4 yang diperbolehkan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = "";
+			return;
+		}
+
+		// Cek ukuran file
+		const maxSize = 2 * 1024 * 1024; // 2MB
+		if (file.size > maxSize) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+						<p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil atau gunakan tautan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = "";
+		}
+	}
+});
+	// end max 2 mb
+</script>
 
 <!-- 
 

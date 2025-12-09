@@ -93,7 +93,7 @@
 </section>
 
 <!-- Modal Preview Soal -->
-<?php $this->load->view('asesmen_standard/preview_question') ?>
+<?php $this->load->view('asesmen_standard/preview_question', ['title' => $exam_header['title']]) ?>
 
 <script>
 	// create swall alert

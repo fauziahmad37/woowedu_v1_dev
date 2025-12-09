@@ -1,79 +1,147 @@
+<style>
+	.star.active {
+		color: gold;
+	}
+</style>
+
 <div class="row mt-4 mb-3">
 	<div class="col">
 		<h5 class="fw-bold">Riwayat Pembelian</h5>
 	</div>
 	<div class="col text-end">
-		<h6>(6 Ebook)</h6>
+		<h6 class="count-riwayat-pembelian"></h6>
 	</div>
 </div>
 
-<div class="list-card">
-	<?php foreach ($transactionPayments as $key) : ?>
+<div id="filter-riwayat-pembelian" class="mb-3">
+	<div class="row">
 
-		<div class="card p-3 mt-4 rounded-4 border-light-subtle border-2">
-
-			<input type="hidden" name="transaction_number" value="<?= $key['transaction_number'] ?>">
-
-			<?php if ($key['status'] == 'pending') : ?>
-				<span class="badge bg-warning-subtle text-warning p-2" style="width: fit-content;">Menunggu Pembayaran</span>
-			<?php elseif ($key['status'] == 'settlement') : ?>
-				<span class="badge bg-success-subtle text-success p-2" style="width: fit-content;">Berhasil</span>
-			<?php elseif ($key['status'] == 'expire') : ?>
-				<span class="badge bg-danger-subtle text-danger p-2" style="width: fit-content;">Kadaluarsa</span>
-			<?php else : ?>
-				<span class="badge bg-danger-subtle text-danger p-2" style="width: fit-content;">Gagal</span>
-			<?php endif ?>
-
-
-			<div class="row mt-4 mb-3">
-				<div class="col-8 d-flex">
-					<img class="" src="assets/images/bundlings/<?= $key['package_image'] ?>" alt="ebook-cover" width="80" height="120" style="border-radius: 12px;">
-					<div class="flex-row ms-3">
-						<p class=""><?= $key['publisher_name'] ?></p>
-						<h5 class=""><?= $key['package_name'] ?></h5>
-					</div>
-				</div>
-				<div class="col-4">
-					<p class="text-end">Jumlah Bayar</p>
-					<p class="text-end fw-bold">Rp <?= str_replace(',', '.', number_format($key['total_payment'])) ?></p>
-				</div>
-			</div>
-
-			<div class="border border-light-subtle border-1"></div>
-
-			<div class="row">
-				<div class="col">
-					<?php if ($key['status'] == 'pending' || $key['status'] == 'expire') : ?>
-						<p class="mt-4" style="font-size: 12px;">Batas waktu pembayaran, <span class="text-danger fw-bold"> <?= date('d M, H:i', strtotime($key['expiry_time'])) ?> </span> </p>
-					<?php endif ?>
-
-				</div>
-				<div class="col text-end pt-3">
-
-					<?php if ($key['status'] == 'settlement') : ?>
-						<!-- jika paket bundle arahkan ke sini -->
-						<?php if ($key['field_table'] == 'bundle') : ?>
-							<a href="bundlingpackage/checkout/<?= $key['bundling_package_id'] ?>" class="btn btn-primary">Beli Lagi</a>
-						<?php endif ?>
-					<?php elseif ($key['status'] == 'pending') : ?>
-						<a href="<?= $key['payment_link'] ?>" class="btn btn-primary">Lanjutkan Pembayaran</a>
-					<?php elseif ($key['status'] == 'expire') : ?>
-						<button class="btn bg-dark-subtle border-light-subtle">Kadaluarsa</button>
-					<?php endif ?>
-
-					<div class="dropdown d-inline-block">
-						<button class="btn btn-clear border-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-							<img src="<?= base_url('assets/images/icons/three-dots-icon.svg') ?>" alt="">
-						</button>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="<?=base_url('checkout/statusPembayaran?transaction_number='.$key['transaction_number'])?>">Lihat Status</a></li>
-							<li><a class="dropdown-item" href="#">Another action</a></li>
-							<li><a class="dropdown-item" href="#">Something else here</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-
+		<!-- select status transaksi -->
+		<div class="col-12 col-md-4">
+			<select class="form-select" id="filter-status-pembelian">
+				<option value="">Semua Status</option>
+				<option value="pending">Pending</option>
+				<option value="settlement">Berhasil</option>
+				<option value="failed">Gagal</option>
+			</select>
 		</div>
-	<?php endforeach ?>
+
+		<!-- input pilih tanggal awal dan akhir -->
+		<div class="col-12 col-md-8 d-flex">
+			<div class="input-group">
+				<input type="date" class="form-control" id="filter-tanggal-awal" placeholder="Tanggal Awal">
+				<span class="input-group-text">s.d.</span>
+				<input type="date" class="form-control" id="filter-tanggal-akhir" placeholder="Tanggal Akhir">
+			</div>
+
+			<button class="ms-2 btn btn-primary" id="btn-cari-riwayat-pembelian">Cari</button>
+			<button class="ms-2 btn border-primary text-primary btn-light" id="btn-reset-riwayat-pembelian">Reset</button>
+		</div>
+
+		<!-- button Cari -->
+
+
+
+	</div>
+</div>
+
+<div id="list-riwayat-pembelian-container">
+</div>
+
+<div class="text-center mt-3">
+	<button class="btn btn-primary" id="show-more-riwayat">Muat Lebih Banyak</button>
+</div>
+
+<!-- Modal Detail Transaksi -->
+<div class="modal fade" id="detailTransaksi" tabindex="-1" aria-labelledby="detailTransaksiLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary text-white">
+				<h1 class="modal-title fs-5" id="detailTransaksiLabel">Detail Transaksi</h1>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<h6 class="mb-3 fw-bold mt-3">Informasi Pembelian</h6>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">No. Invoice</div>
+					<div class="col fw-bold text-end invoice-number"></div>
+				</div>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">Tanggal Pembelian</div>
+					<div class="col fw-bold text-end tanggal-pembelian"></div>
+				</div>
+
+				<hr>
+
+				<h6 class="mb-3 fw-bold mt-4">Rincian Pembayaran</h6>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">Total Ebook</div>
+					<div class="col fw-bold text-end total-ebook"></div>
+				</div>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">Total Harga</div>
+					<div class="col fw-bold text-end total-harga"></div>
+				</div>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">Biaya Admin</div>
+					<div class="col fw-bold text-end amount-admin"></div>
+				</div>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">Kupon & Voucher - <span class="voucher-name"></span></div>
+					<div class="col fw-bold text-end amount-voucher"></div>
+				</div>
+				<div class="row fs-12 mb-3">
+					<div class="col" style="color: #4D505E;">Promo</div>
+					<div class="col fw-bold text-end amount-promo"></div>
+				</div>
+
+				<hr>
+
+				<div class="row mb-3 mt-3">
+					<div class="col">
+						<h5 class="fw-bold">Total Pembelian</h5>
+					</div>
+					<div class="col text-end total-amount h5 fw-bold"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Beri Ulasan -->
+<div class="modal fade" id="reviewModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="reviewModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-primary text-white">
+				<h1 class="modal-title fs-5" id="reviewModalLabel">Beri Ulasan</h1>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+
+
+				<div class="d-flex my-4">
+					<img class="rounded-2 cover-img" v-bind:src="ebook.cover_img" alt="" height="120" width="80">
+					<div class="ms-3">
+						<p class="mb-2" style="color: #74788D; font-size: 12px;">{{ ebook.publisher_name }}</p>
+						<h5 class="mb-2" id="ebook_title">{{ ebook.title }}</h5>
+
+						<div class="give-star">
+							<span class="star" style="font-size: 24px;" v-for="star in 5" :class="{'active': star <= ebook.rating}" @click="setRating(star)">&#9733;</span>
+							<span class="ms-2" style="color: #74788D;">Bagaimana Kualitas Ebook ini?</span>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<label for="review" class="form-label">Ulasan <span class="text-danger">*</span></label>
+					<textarea class="form-control" id="review" rows="3" required></textarea>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" @click="submitReview">Kirim Ulasan</button>
+			</div>
+		</div>
+	</div>
 </div>

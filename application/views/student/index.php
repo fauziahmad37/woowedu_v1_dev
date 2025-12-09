@@ -121,7 +121,7 @@
 			</div>
 		</div> -->
 
-		<div id="chart-absensi-harian">
+		<div id="chart-absensi-harian" class="mt-5">
 
 		</div>
 
@@ -579,18 +579,21 @@
 	//	return num + 1
 	//}); // tiap2 tanggal + 1 karna dari php tanggal nya di awali dengan angka 0
 
-	Highcharts.chart('chart-absensi-harian', {
+	let men = <?= $student_men ?>;
+	let woman = <?= $student_woman ?>;
+
+	let chart = Highcharts.chart('chart-absensi-harian', {
 		chart: {
 			type: 'column'
 		},
 		title: {
-			text: 'Agustus',
+			text: '',
 			align: 'left'
 		},
-		subtitle: {
-			text: 'Data Bulan',
-			align: 'left'
-		},
+		// subtitle: {
+		// 	text: 'Data Bulan',
+		// 	align: 'left'
+		// },
 		xAxis: {
 			// categories: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 			// categories: absentDates,
@@ -618,12 +621,12 @@
 		series: [{
 				name: 'Laki-laki',
 				// data: [200, 175, 185, 198, 159, 167, 178, 165, 196, 165]
-				data: <?= $student_men ?>
+				data: men
 			},
 			{
 				name: 'Perempuan',
 				// data: [98, 78, 86, 98, 87, 79, 86, 98, 67, 98]
-				data: <?= $student_woman ?>
+				data: woman
 			}
 		]
 	});
@@ -785,6 +788,14 @@
 			method: 'GET',
 			data: {}
 		},
+		// drawCallback: function (settings) { 
+		// 	// Here the response
+		// 	var response = settings.json;
+			
+		// 	// draw chart absensi harian
+		// 	chart.series[0].setData([response.total_m]);
+		// 	chart.series[1].setData([response.total_f]);
+		// },
 		select: {
 			style: 'multi',
 			selector: 'td:first-child'

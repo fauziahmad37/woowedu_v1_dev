@@ -54,6 +54,10 @@
 					<i class="fa-solid fa-list me-2"></i>
 					Benar atau Salah
 				</button>
+
+				<span class="ms-3 btn" style="background-color: #E3E4E8; cursor: default;">
+					Jumlah Soal (<span class="jumlah-soal-current">0</span>/<span class="jumlah-soal-active-max">10</span>)
+				</span>
 			</div>
 
 			<!-- col-6 position right -->
@@ -589,6 +593,12 @@
 	$('.simpan-jawaban-true-or-false').click(function(e) {
 		e.preventDefault();
 
+		// AMBIL JUMLAH SOAL DAN LIMIT SOAL DARI HEADER, NANTI AKAN DI PAKAI UNTUK AUTO CLOSE KETIKA SOAL SUDAH MENCAPAI LIMIT
+		let jumlahSoalCurrent = $(this).closest('.header-options').find('.jumlah-soal-current').text();
+		jumlahSoalCurrent = parseInt(jumlahSoalCurrent);
+		let limitSoalCurrent = $(this).closest('.header-options').find('.jumlah-soal-active-max').text();
+		limitSoalCurrent = parseInt(limitSoalCurrent);
+
 		let true_or_false_id = $('#true_or_false_id').val();
 		let card = $(`.card[data="${activeCard}"]`); // get active card
 		let listCardItem = card.find('.card').length;
@@ -679,6 +689,19 @@
 
 		let url = (true_or_false_id) ? BASE_URL + 'Asesmen_standard/update_true_or_false' : BASE_URL + 'Asesmen_standard/save_true_or_false';
 
+		// loading
+
+		Swal.fire({
+			icon: 'info',
+			title: 'Loading...',
+			text: 'Mohon tunggu, data sedang diproses',
+			allowOutsideClick: false,
+			showConfirmButton: false,
+			didOpen: () => {
+				Swal.showLoading();
+			}
+		});
+		// end loading
 		$.ajax({
 			url: url,
 			type: 'POST',
@@ -686,7 +709,7 @@
 			contentType: false,
 			processData: false,
 			success: function(res) {
-
+				Swal.close();
 				if (res.success) {
 					Swal.fire({
 						icon: 'success',
@@ -700,6 +723,9 @@
 					// jika melakukan update soal maka tidak perlu update counter soal
 					if (!true_or_false_id) {
 						$(`#count-soal${activeCard}`).text(listCardItem + 1); // update counter soal
+
+						// update jumlah soal current card
+						$('.jumlah-soal-current').text(listCardItem + 1);
 					}
 
 					// add item to list soal
@@ -798,6 +824,11 @@
 					$('.image-placeholder-jawaban-benar-tof').attr('src', BASE_URL + 'assets/images/icons/tambahkan_gambar_pendukung.svg');
 					$('.image-placeholder-jawaban-salah-tof').attr('src', BASE_URL + 'assets/images/icons/tambahkan_gambar_pendukung.svg');
 
+					// KETIKA JUMLAH SOAL SUDAH SAMA DENGAN LIMIT SOAL MAKA TUTUP MODAL
+					if (jumlahSoalCurrent+1 >= limitSoalCurrent) {
+						setTimeout(()=>{$('.btn-back').click()}, 2000);
+					}
+
 				} else {
 					// reset token
 					$('meta[name="csrf_token"]').attr('content', res.csrf_token);
@@ -838,6 +869,11 @@
 
 		// set active question number active
 		questionNumberActive = $(el).closest('.card').find('.no-soal').text();
+
+		// Get Counter Soal
+		let countSoal = $(`#count-soal${activeCard}`).text();
+		// set header options counter soal
+		$('.jumlah-soal-current').text(countSoal);
 
 		$('.soal-true-or-false-container').removeClass('d-none');
 
@@ -979,4 +1015,67 @@
 		// set form-check-input checked
 		$(el).prop('checked', true);
 	}
+
+
+
+	// untuk foto max 2 mb
+
+document.getElementById('image').addEventListener('change', function () {
+	const file = this.files[0];
+	const allowedTypes = [
+		'image/jpeg', 'image/png',
+		'application/pdf',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/vnd.ms-powerpoint',
+		'audio/mpeg',
+		'video/mp4'
+	];
+
+	if (file) {
+		if (!allowedTypes.includes(file.type)) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Tipe File Tidak Didukung</h2>
+						<p style="margin-top:8px;">Hanya file JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3, dan MP4 yang diperbolehkan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = "";
+			return;
+		}
+
+		const maxSize = 2 * 1024 * 1024; 
+		if (file.size > maxSize) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+						<p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil atau gunakan tautan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = "";
+		}
+	}
+});
+
+	// end max 2 mb
+
+
 </script>

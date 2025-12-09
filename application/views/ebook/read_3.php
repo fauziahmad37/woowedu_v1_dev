@@ -1,3 +1,18 @@
+<?php
+
+    if(!isset($_GET['id'])) 
+        die('Buku tidak teridentifikasi');
+
+    $queryString = [
+        'file' => html_escape(base_url(str_replace('\\', '/', $folderpath).'/'.str_replace('.pdf', '.wpdf', $book['file_1']))),
+        'id'   => $_GET['id'],
+        'lastPage' => $_GET['lastPage'] ?? 1
+    ];
+
+    $qsBuilder = http_build_query($queryString);
+
+?>
+
 <!DOCTYPE html>
 <!--
 Copyright 2012 Mozilla Foundation
@@ -22,19 +37,20 @@ See https://github.com/adobe-type-tools/cmap-resources
 -->
 <html dir="ltr" mozdisallowselectionprint>
   <head>
-    
+    <base href="<?=base_url()?>">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
     <title>PDF.js viewer</title>
-
+	 <script id="info-script" type="application/json"><?=json_encode($queryString, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG)?></script>
 <!-- This snippet is used in production (included from viewer.html) -->
-<link rel="resource" type="application/l10n" href="<?=html_escape(base_url('assets/libs/pdf.js/generic/web/locale/locale.json'))?>">
-<script src="<?=html_escape(base_url('assets/libs/pdf.js/generic/build/pdf.js'))?>" type="module"></script>
-
+	<link rel="resource" type="application/l10n" href="<?=html_escape(base_url('assets/libs/pdf.js/generic/web/locale/locale.json'))?>">
+	<script src="<?=html_escape(base_url('assets/libs/pdf.js/generic/build/pdf.js'))?>" type="module"></script>
     <link rel="stylesheet" href="<?=html_escape(base_url('assets/libs/pdf.js/generic/web/viewer.css'))?>">
-
-  <script src="<?=html_escape(base_url('assets/libs/pdf.js/generic/web/viewer.js'))?>" type="module"></script>
+	<script>
+		const appInfo = JSON.parse(document.getElementById('info-script').textContent);
+	</script>
+	<script src="<?=html_escape(base_url('assets/libs/pdf.js/generic/web/viewer.js'))?>" type="module"></script>
   </head>
 
   <body tabindex="1">
@@ -547,7 +563,7 @@ See https://github.com/adobe-type-tools/cmap-resources
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
 
-    <script type="module">
+    <!-- <script type="module">
       import { PDFViewerApplication, PDFViewerApplicationOptions as AppOption }  from './viewer.js';
       
       const uploadToServer = document.getElementById('saveToServer');
@@ -571,6 +587,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         else
           toolbar.classList.add('hidden');
       });
-    </script>
+    </script>-->
+	 <script src="<?=base_url("assets/libs/pdf.js/generic/web/userAdd.js")?>" type="module"></script>
   </body>
 </html>

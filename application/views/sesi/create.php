@@ -250,25 +250,29 @@
 
 		// Validasi judul
 		if(!title) {
-			warningAlert('Judul tidak boleh kosong'); 
+			// warningAlert('Judul tidak boleh kosong');
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 
 		// Validasi Tanggal
 		if(!tanggal){
-			warningAlert('Tanggal Harus di isi');
+			// warningAlert('Tanggal Harus di isi');
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 
 		// Validasi jamstart
 		if(!jamstart){
-			warningAlert('Jam awal harus isi')
+			// warningAlert('Jam awal harus isi')
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 		
 		// Validasi jamstart
 		if(!jamend){
-			warningAlert('Jam akhir harus isi')
+			// warningAlert('Jam akhir harus isi')
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 
@@ -280,19 +284,22 @@
 
 		// Validasi pilih materi
 		if(!materi_id){
-			warningAlert('Materi harus di isi');
+			// warningAlert('Materi harus di isi');
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 
 		// Validasi pilih kelas
 		if(!class_id){
-			warningAlert('Kelas harus di isi');
+			// warningAlert('Kelas harus di isi');
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 
 		// Validasi keterangan
 		if(!stripHtml(keterangan)){
-			warningAlert('Keterangan harus di isi');
+			// warningAlert('Keterangan harus di isi');
+			warningAlert('Input mandatory tidak boleh kosong');
 			return;
 		}
 

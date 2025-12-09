@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>H Simple Chat Client</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> 
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	
+	<style>
+		.chats-container {
+			height: 400px;
+			overflow-y: scroll;
+			position: relative;
+		}
+		
+		#login-container {
+			width: 100%;
+			height: 100%;
+			background-color: black;
+			display: none;
+		}
+		
+		#form-container {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			max-width: 90%;
+			width: 250px;
+		}
+		
+		.sender, .rcpt {
+			border-radius: 10px;
+			padding: 10px;
+		}
+		
+		.sender {
+			background-color: #2081e8;
+		}
+		
+		.rcpt {
+			background-color: #11a88a;
+		}
+		
+		#chats {
+			
+		}
+	</style>
+	
+	<script>
+		function base64_encode(str) {
+			return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+				function toSolidBytes(match, p1) {
+					return String.fromCharCode('0x' + p1);
+			}));
+		}
+		
+		function base64_decode(str) {
+			return decodeURIComponent(atob(str).split('').map(function(c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+		}
+	</script>
+</head>
+<body>
+
+<div class="container mt-2">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-header" id="room-id-view">
+					Start a chat!
+				</div>
+				
+				<div class="card-body chats-container">
+					<div id="chats">
+						
+					</div>
+					<div id="login-container">
+						<div id="form-container">
+							<h3 class="text-white">Login</h3>
+						
+							<input type="text" id="username" class="form-control" placeholder="Username" /><br />
+							<input type="text" id="room" class="form-control" placeholder="Room" /><br />
+							
+							<button class="btn btn-sm btn-success" id="login">
+								Login
+							</button>
+						</div>
+					</div>
+				</div>
+				
+				<div class="card-footer">
+					<div class="row">
+						<div class="col-9">
+							<input type="text" id="message" class="form-control" placeholder="Messages" />
+						</div>
+						
+						<div class="col-3">
+							<button class="btn btn-sm btn-primary btn-block" id="send">
+								Send
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+(function(){
+	var room = "";
+	var username = "";
+	var ip = "103.123.63.161";
+//	var ip = "103.181.243.145";
+	var port = "45100";
+	var ws = null;
+	
+ 
+	 
+	username = 'hasmi';
+	room = 1;
+	startConnect();
+  
+	
+	$("#send").on("click", send);
+	$("#message").on("keyup", function(e){
+		if(e.keyCode == 13){
+			send();
+		}
+	});
+	
+	function send(){
+		if(room == "" || username == ""){
+			alert("Username and id is not defined. Please refresh");
+		}else{
+			if(ws != null && ws.readyState == WebSocket.OPEN){
+				ws.send(base64_encode($("#message").val()));
+				
+				$("#message").val("");
+			}else{
+				alert("Fail sending message. Your connection has been lost.");
+			}
+		}
+	}
+	
+
+	function startConnect(){
+		//alert("wss://" + ip + ":" + port + "/echo/" + room + "/" + base64_encode(username));
+		ws = new WebSocket("wss://" + ip + ":" + port + "/echo/" + room + "/" + base64_encode(username));
+		
+		ws.onopen = function(){
+			$("#login-container").hide();
+			$("#message").prop("disabled", false);
+			$("#send").prop("disabled", false);
+			
+			$("#room-id-view").text("Chatting Room: " + room);
+		}
+		
+		ws.onmessage = function(m){
+			var data = JSON.parse(base64_decode(m.data));
+			
+			if(base64_decode(data.from) == (username)){
+				$("#chats").append('<div class="row mb-2">\
+					<div class="col-4"></div><div class="col-8 sender text-white">'+ base64_decode(data.message) +'</div>\
+				</div>\
+				');
+			}else{
+				$("#chats").append('<div class="row mb-2">\
+					<div class="col-8 rcpt text-white"><strong>('+ base64_decode(data.from) +')</strong>:'+ base64_decode(data.message) +'</div>\
+				</div>\
+				');
+			}
+			
+		};
+		
+		ws.onclose = function(){
+			$("#message").prop("disabled", true);
+			$("#send").prop("disabled", true);
+			$("#login-container").show();
+			$("#room-id-view").text("Start a chat!");
+			
+			alert("Connection to server closed.");
+		};
+		
+		ws.onerror = function(e){
+			console.log(e);
+		};
+	}
+})();
+
+</script>
+</body>
+</html> 

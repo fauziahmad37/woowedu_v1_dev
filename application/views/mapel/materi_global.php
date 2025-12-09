@@ -38,11 +38,13 @@
 		}
 
 		form[name="frm-filter"] div:nth-child(1) {
-			width: 60%;
+			width: 65%;
 		}
 	
 		form[name="frm-filter"] div:nth-child(2) {
-			width: 40%;
+			width: 35%;
+			padding-left: 0px;
+			padding-right: 0px;
 		}
 	}
 	

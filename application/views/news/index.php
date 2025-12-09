@@ -12,6 +12,10 @@
 
 		<div class="col-lg-4 col-md-12 col-sm-12 mt-3">
 			<div class="mb-3 input-group mb-3">
+
+				<input type="hidden" name="user_id" id="user_id" value="<?=$_SESSION['userid'] ?? ''?>">
+				<input type="hidden" name="user_level" id="user_level" value="<?=$_SESSION['user_level'] ?? ''?>">
+
 				<input type="text" class="form-control" id="judul" name="judul" placeholder="Cari pengumuman disini">
 				<input type="hidden" name="<?=$this->security->get_csrf_token_name();?>" value="<?=$this->security->get_csrf_hash();?>">
 				

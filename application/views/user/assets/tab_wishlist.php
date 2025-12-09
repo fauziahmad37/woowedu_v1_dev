@@ -26,14 +26,14 @@
 		<h5 class="fw-bold">Wishlist</h5>
 	</div>
 	<div class="col-6 text-end">
-		(<?= count($wishlists) ?> Ebook)
+		<span class="wishlist-count">
 	</div>
 </div>
 
 
 <section id="thumbnail-carousel-wishlists" class="splide" aria-label="The carousel with thumbnails. Selecting a thumbnail will change the Beautiful Gallery carousel.">
 	<div class="splide__track">
-		<ul class="splide__list" id="list-buku-terlaris">
+		<ul class="splide__list" id="list-wishlist">
 			<?php foreach ($wishlists as $val) : ?>
 				<li class="splide__slide">
 					<a href="<?=($val['item_type'] == 'ebook') ? 'Ebook/detail/'.$val['id'] : 'BundlingPackage/detail/'.$val['id'] ?> " class="text-decoration-none">

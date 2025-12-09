@@ -51,6 +51,9 @@ if ($user_data['user_level'] == 4) {
 ?>
 
 <section class="explore-section section-padding" id="section_2">
+	<input type="hidden" name="menu" value="<?= $menu ?>">
+	<input type="hidden" name="tab" value="<?= $tab ?>">
+
 	<div class="container mt-5">
 		<div class="col-12 text-center">
 			<!-- <h4 class="mb-4">Profile Saya</h4> -->
@@ -324,6 +327,30 @@ if ($user_data['user_level'] == 4) {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+	$(document).ready(function() {
+		// CEK MENU DAN TAB
+		let menu = $('input[name="menu"]').val();
+		let tab = $('input[name="tab"]').val();
+
+		if (menu == 'laporan_ebook') {
+			// JIKA MENU LAPORAN EBOOK MAKA TAMPILKAN TAB LAPORAN EBOOK
+			$('#v-pills-laporan-ebook-tab').click();
+		} else if (menu == 'riwayat_pembelian') {
+			// JIKA MENU RIWAYAT PEMBELIAN MAKA TAMPILKAN TAB RIWAYAT PEMBELIAN
+			$('#v-pills-laporan-ebook-tab').click();
+			$('#nav-riwayat-pembelian-tab').click();
+		} else if (menu == 'wishlist') {
+			// JIKA MENU WISHLIST MAKA TAMPILKAN TAB WISHLIST
+			$('#v-pills-laporan-ebook-tab').click();
+			$('#nav-wishlist-tab').click();
+		} else if (menu == "cart") {
+			// JIKA MENU CART MAKA TAMPILKAN TAB CART
+			$('#v-pills-laporan-ebook-tab').click();
+			$('#nav-keranjang-tab').click();
+		}
+	});
+
+
 	$('#userfile').bind('change', function() {
 		// JIKA FILE MELEBIHI 1 MB MAKA FILE TIDAK AKAN DI UPLOAD
 
@@ -396,9 +423,9 @@ if ($user_data['user_level'] == 4) {
 					});
 				} else {
 					let message;
-					if(res.message.old_password) message = res.message.old_password
-					if(res.message.new_password) message = res.message.new_password
-					if(res.message.confirm_password) message = res.message.confirm_password
+					if (res.message.old_password) message = res.message.old_password
+					if (res.message.new_password) message = res.message.new_password
+					if (res.message.confirm_password) message = res.message.confirm_password
 
 					Swal.fire({
 						icon: 'error',

@@ -48,6 +48,23 @@
 			float: right;
 		}
 	}
+
+	
+	.maximum-file {
+    color:#f46a6a; 
+    font-size:10px;
+	margin-left:10px;
+}
+
+  .swal2-popup .swal-wide-button {
+	background-color:#281B93 !important;
+        width: 100% !important;
+    }
+	.icon-faild {
+		font-size:40px; 
+		color:#f27474; 
+		margin-bottom:10px;
+	}
 	
 </style>
 
@@ -158,7 +175,9 @@
 									<div class="input-group input-group-sm ms-2 me-0">
 										<input type="file" class="form-control form-control-sm" id="videoFile" name="a_materi_video">
 										<label class="form-label overflow-hidden" id="video-label" for="videoFile" data-browse="Unggah Video"></label>
+									 
 									</div>
+									<p class="maximum-file">Maksimal ukuran file 2MB, Tipe File JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3 dan MP4</p>
 								</div>					
 							</div>	
 							
@@ -194,3 +213,54 @@
 	  </div>
 	</section>
 <!-- End Modal -->
+
+
+<script>
+
+	// untuk upload file maksimal 2 mb
+
+    document.getElementById('videoFile').addEventListener('change', function () {
+        const file = this.files[0];
+		const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-powerpoint', 'audio/mpeg', 'video/mp4'];
+        
+		if (file) {
+			// Cek apakah file ada dan tipe file sesuai
+			if (!allowedTypes.includes(file.type)) {
+				Swal.fire({
+					html: `
+						<div class="icon-faild">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Tipe File Tidak Didukung</h2>
+						<p style="margin-top:8px;">Hanya file JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3, dan MP4 yang diperbolehkan.</p>
+					`,
+					showCloseButton: false,
+					showConfirmButton: true,
+					confirmButtonText: 'Upload Ulang',
+					customClass: {
+						confirmButton: 'swal-wide-button'
+					}
+				});
+				this.value = "";
+				return;
+			}
+
+            const maxSize = 2 * 1024 * 1024; // 2MB
+            if (file.size > maxSize) {
+                Swal.fire({
+                    html: `
+                        <div class="icon-faild">&#10060;</div>
+                        <h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+                        <p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil atau gunakan tautan.</p>
+                    `,
+                    showCloseButton: false,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Upload Ulang',
+                    customClass: {
+                        confirmButton: 'swal-wide-button'
+                    }
+                });
+                this.value = "";
+            }
+        }
+    });
+	// end file maksimal
+</script>

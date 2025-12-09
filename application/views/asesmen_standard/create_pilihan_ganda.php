@@ -2,6 +2,14 @@
 <!-- tes ubah git -->
 <!-- custom css -->
 <style>
+
+	html, body {
+    height: auto !important;
+    max-height: none;
+    overflow-y: visible !important;
+}
+
+
 	.image-place-holder-pg {
 		height: 100%;
 		width: 100%;
@@ -30,7 +38,16 @@
 		background-color: var(--bs-primary-300);
 	}
 
-
+  .swal2-popup .swal-wide-button {
+	background-color:#281B93 !important;
+        width: 100% !important;
+    }
+	.icon-faild {
+		text-align:center;
+		font-size:40px; 
+		color:#f27474; 
+		margin-bottom:10px;
+	}
 	/* .form-select {
 		width: 120px;
 	} */
@@ -40,7 +57,7 @@
 	<div class="container py-4">
 		<div class="row">
 			<div class="col-xl-6 col-lg-4 col-md-6 mb-2">
-				<button class="btn-back btn btn-light border border-1 border-dark rounded-3 me-2">
+				<button class="btn-back btn btn-light border border-1 border-dark rounded-3 me-3">
 					<i class="fa-solid fa-chevron-left"></i>
 				</button>
 
@@ -48,6 +65,10 @@
 					<i class="fa-solid fa-list me-2"></i>
 					Pilihan Ganda
 				</button>
+
+				<span class="ms-3 btn" style="background-color: #E3E4E8; cursor: default;">
+					Jumlah Soal (<span class="jumlah-soal-current">0</span>/<span class="jumlah-soal-active-max">10</span>)
+				</span>
 			</div>
 
 			<!-- col-6 position right -->
@@ -142,7 +163,7 @@
 
 
 	<!-- Respon jawaban -->
-	<div class="respon-jawaban-container bg-primary container rounded-4 p-4 d-none" style="min-height: 600px; margin-top:40px;">
+	<div class="respon-jawaban-container bg-primary container rounded-4 p-4 d-none" style="margin-top:40px;">
 		<!-- Header respon jawaban -->
 		<div class="row">
 			<div class="col">
@@ -263,6 +284,85 @@
 <!-- <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script> -->
 
+
+
+
 <script>
-	
+document.querySelector('.soal-pilihan-ganda-container').classList.remove('d-none');
+document.body.style.overflow = 'hidden';
+document.querySelector('.soal-pilihan-ganda-container').classList.add('d-none');
+document.body.style.overflow = '';
+
+// upload foto maks 2mb 
+
+function validateFileInput(input) {
+	const file = input.files[0];
+	const allowedTypes = [
+		'image/jpeg', 'image/png',
+		'application/pdf',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/vnd.ms-powerpoint',
+		'audio/mpeg',
+		'video/mp4'
+	];
+
+	if (file) {
+		if (!allowedTypes.includes(file.type)) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Tipe File Tidak Didukung</h2>
+						<p style="margin-top:8px;">Hanya file JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3, dan MP4 yang diperbolehkan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			input.value = "";
+			return;
+		}
+
+		const maxSize = 2 * 1024 * 1024;
+		if (file.size > maxSize) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+						<p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil atau gunakan tautan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			input.value = "";
+		}
+	}
+}
+
+
+
+// Untuk #input_image_question_pg
+document.getElementById('input_image_question_pg').addEventListener('change', function () {
+	validateFileInput(this);
+});
+
+// Untuk semua input jawaban
+document.querySelectorAll('input[name="image-choice[]"]').forEach(function (input) {
+	input.addEventListener('change', function () {
+		validateFileInput(this);
+	});
+});
+
+// end foto
 </script>

@@ -1,9 +1,16 @@
 <style>
+
+	.select2.select2-container {
+		width: 100% !important;
+		margin-right: 10px;
+	}
+
 	.list-ebook {
 		display: none;
 	}
 
-	.group-ebook-saya .card>img {
+	.group-ebook-saya .card>img, 
+	#group-semua-buku .card>img {
 		width: 211px;
 		height: 300px;
 	}
@@ -33,6 +40,28 @@
 	</div>
 </div>
 
+<div id="filter-ebook-saya" class="mb-3">
+	<div class="row">
+
+		<!-- input pilih kategori -->
+		<div class="col-lg-6 col-md-6 col-sm-12 d-flex">
+
+			<select class="form-select me-2" name="select-category" id="select-category" aria-label="Pilih Matapelajaran"></select>
+
+			<div class="input-group d-none">
+				<input type="date" class="form-control" id="filter-tanggal-awal-ebook" placeholder="Tanggal Awal">
+				<span class="input-group-text">s.d.</span>
+				<input type="date" class="form-control" id="filter-tanggal-akhir-ebook" placeholder="Tanggal Akhir">
+			</div>
+
+			<button type="submit" class="ms-2 btn btn-primary" id="btn-cari-riwayat-ebook-saya">Cari</button>
+			<button class="ms-2 btn btn-light border-primary" id="btn-reset-riwayat-ebook-saya">Reset</button>
+		</div>
+
+		<!-- button Cari -->
+	</div>
+</div>
+
 <div class="row mt-4">
 	<div class="col" id="btn-status-buku">
 		<button class="btn btn-lg btn-light border-1 border-dark-subtle rounded-pill mt-2 me-2 fs-14 active" id="btn-belum-dibaca" onclick="btnStatusBuku(this)">Belum Dibaca</button>
@@ -41,20 +70,24 @@
 	</div>
 </div>
 
+<div id="group-semua-buku" class="row flex-nowrap overflow-auto mt-5 pb-5 mx-1 list-ebook">
+</div>
+
 <div class="group-ebook-saya" style="">
+
 	<div id="group-belum-dibaca" class="row flex-nowrap overflow-auto mt-5 pb-5 mx-1 list-ebook">
 
-		<?php foreach ($ebook_members as $ebook_member) : ?>
-			<?php if ($ebook_member['read_status'] == 0) : ?>
+		<!-- <?php // foreach ($ebook_members as $ebook_member) : ?>
+			<?php // if ($ebook_member['read_status'] == 0) : ?>
 				<div class="card rounded-4 me-4 pb-3" style="width: 233px; display:inline-block; float:none;">
-					<img class="img-fluid mt-2 rounded-3" src="assets/images/ebooks/cover/<?= $ebook_member['cover_img'] ?>" alt="">
+					<img class="img-fluid mt-2 rounded-3" src="assets/images/ebooks/cover/<? // = $ebook_member['cover_img'] ?>" alt="">
 
-					<div class="cover-kadaluarsa <?= (strtotime($ebook_member['end_activation']) < time()) ? '' : 'd-none' ?>">
+					<div class="cover-kadaluarsa <? // = (strtotime($ebook_member['end_activation']) < time()) ? '' : 'd-none' ?>">
 						<button class="btn btn-lg fs-12 rounded-pill text-white" style="background: #74788D;">KADALUARSA</button>
 					</div>
 
-					<p class="publisher-name fs-12 mt-3 text-body-secondary">Penerbit: <?= $ebook_member['publisher_name'] ?></p>
-					<p class="book-title-card mt-2 fs-16 fw-bold"><?= $ebook_member['title'] ?></p>
+					<p class="publisher-name fs-12 mt-3 text-body-secondary">Penerbit: <? // = $ebook_member['publisher_name'] ?></p>
+					<p class="book-title-card mt-2 fs-16 fw-bold"><? // = $ebook_member['title'] ?></p>
 
 					<div class="row text-body-secondary">
 						<div class="col-8 fs-12">Progress Membaca</div>
@@ -64,23 +97,23 @@
 					<div class="progress mt-2" style="margin-bottom: 60px;" role="progressbar" aria-label="Example 5px high" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="height: 10px">
 						<div class="progress-bar" style="width: 0%"></div>
 					</div>
-					<?php if (strtotime($ebook_member['end_activation']) < time()) : ?>
-						<a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>" class="btn btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%; background:#D1D2D9;">Aktifkan Langganan</a>
-					<?php else : ?>
-						<a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>" class="btn btn-primary btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%;"><img src="assets/images/icons/book-open.png" width="16" alt="" class="me-2">Mulai Baca</a>
-					<?php endif ?>
+					<?php // if (strtotime($ebook_member['end_activation']) < time()) : ?>
+						<a href="ebook/detail/<? // = $ebook_member['ebook_id'] ?>" class="btn btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%; background:#D1D2D9;">Aktifkan Langganan</a>
+					<?php // else : ?>
+						<a href="ebook/detail/<? // = $ebook_member['ebook_id'] ?>" class="btn btn-primary btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%;"><img src="assets/images/icons/book-open.png" width="16" alt="" class="me-2">Mulai Baca</a>
+					<?php // endif ?>
 				</div>
-			<?php endif ?>
-		<?php endforeach ?>
+			<?php // endif ?>
+		<?php // endforeach ?> -->
 	</div>
 
 	<div id="group-sedang-dibaca" class="row flex-nowrap overflow-auto mt-5 pb-5 mx-1 list-ebook">
-		<?php foreach ($ebook_members as $ebook_member) : ?>
-			<?php if ($ebook_member['read_status'] == 1) : ?>
+		<!-- <?php // foreach ($ebook_members as $ebook_member) : ?>
+			<?php // if ($ebook_member['read_status'] == 1) : ?>
 				<div class="card rounded-4 me-4 pb-3" style="width: 233px; display:inline-block; float:none;">
-					<img class="img-fluid mt-2 rounded-3" src="assets/images/ebooks/cover/<?= $ebook_member['cover_img'] ?>" alt="">
-					<p class="publisher-name fs-12 mt-3 text-body-secondary">Penerbit: <?= $ebook_member['publisher_name'] ?></p>
-					<p class="book-title-card mt-2 fs-16 fw-bold"><?= $ebook_member['title'] ?></p>
+					<img class="img-fluid mt-2 rounded-3" src="assets/images/ebooks/cover/<? // = $ebook_member['cover_img'] ?>" alt="">
+					<p class="publisher-name fs-12 mt-3 text-body-secondary">Penerbit: <? // = $ebook_member['publisher_name'] ?></p>
+					<p class="book-title-card mt-2 fs-16 fw-bold"><? // = $ebook_member['title'] ?></p>
 
 					<div class="row text-body-secondary">
 						<div class="col-8 fs-12">Progress Membaca</div>
@@ -91,23 +124,23 @@
 						<div class="progress-bar" style="width: 25%"></div>
 					</div>
 
-					<?php if (strtotime($ebook_member['end_activation']) < time()) : ?>
-						<a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>" class="btn btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%; background:#D1D2D9;">Aktifkan Langganan</a>
-					<?php else : ?>
-						<a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>" class="btn btn-primary btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%;"><img src="assets/images/icons/book-open.png" width="16" alt="" class="me-2">Lanjutkan Membaca</a>
-					<?php endif ?>
+					<?php // if (strtotime($ebook_member['end_activation']) < time()) : ?>
+						<a href="ebook/detail/<? // = $ebook_member['ebook_id'] ?>" class="btn btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%; background:#D1D2D9;">Aktifkan Langganan</a>
+					<?php // else : ?>
+						<a href="ebook/detail/<? // = $ebook_member['ebook_id'] ?>" class="btn btn-primary btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%;"><img src="assets/images/icons/book-open.png" width="16" alt="" class="me-2">Lanjutkan Membaca</a>
+					<?php // endif ?>
 				</div>
-			<?php endif ?>
-		<?php endforeach ?>
+			<?php // endif ?>
+		<?php // endforeach ?> -->
 	</div>
 
 	<div id="group-selesai-dibaca" class="row flex-nowrap overflow-auto mt-5 pb-5 mx-1 list-ebook">
-		<?php foreach ($ebook_members as $ebook_member) : ?>
-			<?php if ($ebook_member['read_status'] == 2) : ?>
+		<!-- <?php // foreach ($ebook_members as $ebook_member) : ?>
+			<?php // if ($ebook_member['read_status'] == 2) : ?>
 				<div class="card rounded-4 me-4 pb-3" style="width: 233px; display:inline-block; float:none;">
-					<img class="img-fluid mt-2 rounded-3" src="assets/images/ebooks/cover/<?= $ebook_member['cover_img'] ?>" alt="">
-					<p class="publisher-name fs-12 mt-3 text-body-secondary">Penerbit: <?= $ebook_member['publisher_name'] ?></p>
-					<p class="book-title-card mt-2 fs-16 fw-bold"><?= $ebook_member['title'] ?></p>
+					<img class="img-fluid mt-2 rounded-3" src="assets/images/ebooks/cover/<? // = $ebook_member['cover_img'] ?>" alt="">
+					<p class="publisher-name fs-12 mt-3 text-body-secondary">Penerbit: <? // = $ebook_member['publisher_name'] ?></p>
+					<p class="book-title-card mt-2 fs-16 fw-bold"><? // = $ebook_member['title'] ?></p>
 
 					<div class="row text-body-secondary">
 						<div class="col-8 fs-12">Progress Membaca</div>
@@ -117,19 +150,20 @@
 					<div class="progress mt-2" style="margin-bottom: 60px;" role="progressbar" aria-label="Example 5px high" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 10px">
 						<div class="progress-bar" style="width: 100%"></div>
 					</div>
-					<?php if (strtotime($ebook_member['end_activation']) < time()) : ?>
-						<a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>" class="btn btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%; background:#D1D2D9;">Aktifkan Langganan</a>
-					<?php else : ?>
-						<a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>" class="btn btn-primary btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%;"><img src="assets/images/icons/book-open.png" width="16" alt="" class="me-2">Baca Ulang</a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>">
-					<?php endif ?>
+					<?php // if (strtotime($ebook_member['end_activation']) < time()) : ?>
+						<a href="ebook/detail/<? // = $ebook_member['ebook_id'] ?>" class="btn btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%; background:#D1D2D9;">Aktifkan Langganan</a>
+					<?php // else : ?>
+						<a href="ebook/detail/<? // = $ebook_member['ebook_id'] ?>" class="btn btn-primary btn-lg position-absolute mb-2 fs-12" style="bottom:5px; width: 90%;"><img src="assets/images/icons/book-open.png" width="16" alt="" class="me-2">Baca Ulang</a href="ebook/detail/<?= $ebook_member['ebook_id'] ?>">
+					<?php // endif ?>
 				</div>
-			<?php endif ?>
-		<?php endforeach ?>
+			<?php // endif ?>
+		<?php // endforeach ?> -->
 	</div>
 </div>
 
 <script>
 	$(document).ready(function() {
+		document.getElementById('group-semua-buku').classList.add('d-none');
 		document.getElementById('group-belum-dibaca').style.display = 'flex';
 	});
 </script>
@@ -142,6 +176,13 @@
 		});
 
 		e.classList.add("active"); // tambahkan class active pada button yg di klik
+
+		// remove container group-semua-buku
+		group_semua_buku.classList.remove('d-flex');
+		group_semua_buku.innerHTML = '';
+
+		// remove display none di group-ebook-saya
+		document.getElementsByClassName('group-ebook-saya')[0].style.display = 'flex';
 
 		let listBookGroups = document.querySelectorAll('.list-ebook'); // ambil semua group list book
 		listBookGroups.forEach(function(item, index, arr) {
@@ -163,6 +204,7 @@
 
 	}
 
+	contentSlider('#group-semua-buku');
 	contentSlider('#group-belum-dibaca');
 	contentSlider('#group-sedang-dibaca');
 	contentSlider('#group-selesai-dibaca');

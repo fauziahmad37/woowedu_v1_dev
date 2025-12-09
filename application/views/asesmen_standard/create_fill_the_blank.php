@@ -28,6 +28,23 @@
 		border-right: unset;
 	}
 
+ .swal2-popup .swal-wide-button {
+	background-color: #281B93 !important;
+	width: 100% !important;
+	border: none !important;
+	color: white !important;
+	padding: 10px 0 !important;
+	border-radius: 6px !important;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+	.icon-faild {
+		font-size:40px; 
+		color:#f27474; 
+		margin-bottom:10px;
+	}
+	
 	/* .form-select {
 		width: 120px;
 	} */
@@ -45,6 +62,10 @@
 					<i class="fa-solid fa-list me-2"></i>
 					<span class="soal-title">Isi Yang Kosong</span>
 				</button>
+
+				<span class="ms-3 btn" style="background-color: #E3E4E8; cursor: default;">
+					Jumlah Soal (<span class="jumlah-soal-current">0</span>/<span class="jumlah-soal-active-max">10</span>)
+				</span>
 			</div>
 
 			<!-- col-6 position right -->
@@ -84,7 +105,7 @@
 
 						<!-- button delete & change image -->
 						<div class="button-change-image d-flex justify-content-between mt-3">
-							<button class="btn btn-light border-1 rounded-3 edit-pic" style="width: 45%;"><i class="fas fa-edit"></i></button>
+							<button class="btn btn-light border-1 rounded-3 edit-pic-essay" style="width: 45%;"><i class="fas fa-edit"></i></button>
 							<button class="btn btn-light border-1 rounded-3 delete-pic" style="width: 45%;"><i class="fas fa-trash"></i></button>
 						</div>
 
@@ -313,7 +334,7 @@
 			$('.button-change-image').css('z-index', '1000');
 			$('.button-change-image').css('display', 'unset !important');
 
-			$('.edit-pic').css('display', 'unset');
+			$('.edit-pic-essay').css('display', 'unset');
 			$('.delete-pic').css('display', 'unset');
 
 
@@ -323,7 +344,7 @@
 
 	// mouse leave image container
 	$('.image-container').mouseleave(function() {
-		$('.edit-pic').css('display', 'none');
+		$('.edit-pic-essay').css('display', 'none');
 		$('.delete-pic').css('display', 'none');
 
 		$('.image-place-holder').css('opacity', '1');
@@ -336,7 +357,7 @@
 	});
 
 	// edit image
-	$('.edit-pic').click(function() {
+	$('.edit-pic-essay').click(function() {
 		$('#image').click();
 
 		$('#image').change(function() {
@@ -602,6 +623,12 @@
 	$('.simpan-jawaban-fill-the-blank').click(function(e) {
 		e.preventDefault();
 
+		// AMBIL JUMLAH SOAL DAN LIMIT SOAL DARI HEADER, NANTI AKAN DI PAKAI UNTUK AUTO CLOSE KETIKA SOAL SUDAH MENCAPAI LIMIT
+		let jumlahSoalCurrent = $(this).closest('.header-options').find('.jumlah-soal-current').text();
+		jumlahSoalCurrent = parseInt(jumlahSoalCurrent);
+		let limitSoalCurrent = $(this).closest('.header-options').find('.jumlah-soal-active-max').text();
+		limitSoalCurrent = parseInt(limitSoalCurrent);
+
 		let fiil_the_blank_id = $('#fiil_the_blank_id').val();
 		let card = $(`.card[data="${activeCard}"]`); // get active card
 		let listCardItem = card.find('.card').length;
@@ -625,6 +652,17 @@
 		let mapel = $('#select-mapel').val();
 		let soal = $('#soalFillTheBlank').val();
 		let jawaban = $('#jawaban').text();
+
+		// Validasi input jawaban
+		if (jawaban.includes('Ketik jawaban di sini...') || jawaban.trim() === '') {
+			Swal.fire({
+				icon: 'error',
+				title: 'Gagal',
+				text: 'Jawaban tidak boleh kosong',
+			});
+			return;
+		}
+
 		let image = $('#image')[0].files[0];
 		
 		let responseJawabanCheck = $('#responJawabanFillTheBlank')[0].checked;
@@ -681,7 +719,19 @@
 		form.append('jawabanAlternatifCheck', jawabanAlternatifCheck);
 
 		let url = (fiil_the_blank_id) ? BASE_URL + 'Asesmen_standard/update_fill_the_blank' : BASE_URL + 'Asesmen_standard/save_fill_the_blank';
+		// loading
+		Swal.fire({
+			icon: 'info',
+			title: 'Loading...',
+			text: 'Mohon tunggu, data sedang diproses',
+			allowOutsideClick: false,
+			showConfirmButton: false,
+			didOpen: () => {
+				Swal.showLoading();
+			}
+		});
 
+		// end loading
 		$.ajax({
 			url: url,
 			type: 'POST',
@@ -689,7 +739,7 @@
 			contentType: false,
 			processData: false,
 			success: function(res) {
-
+				Swal.close();
 				if (res.success) {
 					
 					Swal.fire({
@@ -704,6 +754,9 @@
 					// jika melakukan update soal maka tidak perlu update counter soal
 					if (!fiil_the_blank_id) {
 						$(`#count-soal${activeCard}`).text(listCardItem + 1); // update counter soal
+
+						// update jumlah soal current card
+						$('.jumlah-soal-current').text(listCardItem + 1);
 					}
 
 					// add item to list soal
@@ -812,6 +865,15 @@
 					$('.image-placeholder-jawaban-benar-essay').attr('src', BASE_URL + 'assets/images/icons/tambahkan_gambar_pendukung.svg');
 					$('.image-placeholder-jawaban-salah-essay').attr('src', BASE_URL + 'assets/images/icons/tambahkan_gambar_pendukung.svg');
 
+					// KETIKA JUMLAH SOAL SUDAH SAMA DENGAN LIMIT SOAL MAKA TUTUP MODAL
+					if (jumlahSoalCurrent+1 >= limitSoalCurrent) {
+						setTimeout(()=>{$('.btn-back').click()}, 2000);
+					}
+
+					// JIKA MELAKUKAN UPDATE MAKA CLOSE MODAL
+					if (fiil_the_blank_id) {
+						$('.btn-back').click();
+					}
 
 				} else {
 					// reset csrf token
@@ -823,7 +885,13 @@
 						text: res.message,
 					});
 				}
+
+				
+
+				
 			}
+
+
 		});
 	});
 
@@ -853,6 +921,11 @@
 
 		// set active card
 		activeCard = $(el).closest('.card-group-custom').attr('data');
+
+		// get counter soal
+		let countSoal = $(`#count-soal${activeCard}`).text();
+		// set count soal to header
+		$('.jumlah-soal-current').text(countSoal);
 
 		$('.soal-fill-the-blank-container').removeClass('d-none');
 
@@ -950,4 +1023,66 @@
 			}
 		});
 	}
+
+
+	// untuk foto max 2 mb
+
+document.getElementById('image').addEventListener('change', function () {
+	const file = this.files[0];
+	const allowedTypes = [
+		'image/jpeg', 'image/png',
+		'application/pdf',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'application/vnd.ms-powerpoint',
+		'audio/mpeg',
+		'video/mp4'
+	];
+
+	if (file) {
+		// Cek tipe file
+		if (!allowedTypes.includes(file.type)) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Tipe File Tidak Didukung</h2>
+						<p style="margin-top:8px;">Hanya file JPG, JPEG, PNG, DOCX, XLSX, PPT, PDF, MP3, dan MP4 yang diperbolehkan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = "";
+			return;
+		}
+
+		// Cek ukuran file
+		const maxSize = 2 * 1024 * 1024; // 2MB
+		if (file.size > maxSize) {
+			Swal.fire({
+				html: `
+					<div style="text-align: center;">
+						<div class="icon-faild" style="font-size: 40px; color: red;">&#10060;</div>
+						<h2 style="margin:0; font-size:1.4em;">Ukuran File Terlalu Besar</h2>
+						<p style="margin-top:8px;">Ukuran file melebihi 2MB. Silakan pilih file yang lebih kecil atau gunakan tautan.</p>
+					</div>
+				`,
+				showCloseButton: false,
+				showConfirmButton: true,
+				confirmButtonText: 'Upload Ulang',
+				customClass: {
+					confirmButton: 'swal-wide-button'
+				}
+			});
+			this.value = "";
+		}
+	}
+});
+
+	// end max 2 mb
 </script>

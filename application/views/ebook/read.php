@@ -5,7 +5,9 @@
     $queryString = [
         'file' => html_escape(base_url(str_replace('\\', '/', $folderpath).'/'.str_replace('.pdf', '.wpdf', $book['file_1']))),
         'id'   => $_GET['id'],
-        'lastPage' => $_GET['lastPage'] ?? 1
+        'ebook_id' => $book['id'],
+        'lastPage' => $_GET['lastPage'] ?? 1,
+        'my_ebook_id' => $my_ebook_id ?? 0
     ];
 
     $qsBuilder = http_build_query($queryString);

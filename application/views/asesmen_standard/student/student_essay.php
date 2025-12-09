@@ -186,71 +186,71 @@
 
 				// jika jawaban benar lakukan hide atau show element
 				if (resultAnswer) {
-					(new Audio(BASE_URL + "assets/audios/success-1-6297.mp3")).play();
-					confetti({
-						particleCount: 150,
-						spread: 70,
-						origin: {
-							y: 0.6
-						},
-					});
+					// (new Audio(BASE_URL + "assets/audios/success-1-6297.mp3")).play();
+					// confetti({
+					// 	particleCount: 150,
+					// 	spread: 70,
+					// 	origin: {
+					// 		y: 0.6
+					// 	},
+					// });
 
 					$('.circle-correct').removeClass('d-none');
 
-					$('.footer-essay').addClass('d-none');
+					// $('.footer-essay').addClass('d-none');
 					$('.alert-essay-true').removeClass('d-none');
 
 					// hide alert benar setelah 3 detik
 					setTimeout(() => {
 						$('.footer-essay').removeClass('d-none');
-						$('.alert-essay-true').addClass('d-none');
+						// $('.alert-essay-true').addClass('d-none');
 
 						// jika soal memiliki response jawaban benar
 						// jika response jawaban berupa gambar dan text
-						if (val.response_correct_answer && val.response_correct_answer_file) {
-							$('.main-response-answer').removeClass('d-none');
-							$('.image-response-answer-container').removeClass('d-none');
-							$('.image-response-answer-container img').attr('src', ADMIN_URL + val.response_correct_answer_file);
-							$('.response-answer-content').html(val.response_correct_answer);
-						}
+						// if (val.response_correct_answer && val.response_correct_answer_file) {
+						// 	$('.main-response-answer').removeClass('d-none');
+						// 	$('.image-response-answer-container').removeClass('d-none');
+						// 	$('.image-response-answer-container img').attr('src', ADMIN_URL + val.response_correct_answer_file);
+						// 	$('.response-answer-content').html(val.response_correct_answer);
+						// }
 
 						// jika response jawaban berupa text
-						if (val.response_correct_answer && !val.response_correct_answer_file) {
-							$('.main-response-answer').removeClass('d-none');
-							$('.image-response-answer-container').addClass('d-none');
-							$('.response-answer-content').html(val.response_correct_answer);
-						}
+						// if (val.response_correct_answer && !val.response_correct_answer_file) {
+						// 	$('.main-response-answer').removeClass('d-none');
+						// 	$('.image-response-answer-container').addClass('d-none');
+						// 	$('.response-answer-content').html(val.response_correct_answer);
+						// }
 					}, 3000);
 
 
 				} else {
-					(new Audio(BASE_URL + "assets/audios/trumpet-fail-242645.mp3")).play();
+					// (new Audio(BASE_URL + "assets/audios/trumpet-fail-242645.mp3")).play();
 					// tampilkan element jawaban salah di footer
-					$('.circle-incorrect').removeClass('d-none');
+					// $('.circle-incorrect').removeClass('d-none');
 
-					$('.footer-essay').addClass('d-none');
-					$('.alert-essay-false').removeClass('d-none');
+					// $('.footer-essay').addClass('d-none');
+					// $('.alert-essay-false').removeClass('d-none');
 
 					// hide alert salah setelah 3 detik
 					setTimeout(() => {
 						$('.footer-essay').removeClass('d-none');
-						$('.alert-essay-false').addClass('d-none');
+						// $('.alert-essay-false').addClass('d-none');
 
 						// jika soal memiliki response jawaban salah
 						// jika response jawaban berupa gambar dan text
-						if (val.response_wrong_answer && val.response_wrong_answer_file) {
-							$('.main-response-answer').removeClass('d-none');
-							$('.image-response-answer-container').removeClass('d-none');
-							$('.image-response-answer-container img').attr('src', ADMIN_URL + val.response_wrong_answer_file);
-							$('.response-answer-content').html(val.response_wrong_answer);
-						}
+						// if (val.response_wrong_answer && val.response_wrong_answer_file) {
+						// 	$('.main-response-answer').removeClass('d-none');
+						// 	$('.image-response-answer-container').removeClass('d-none');
+						// 	$('.image-response-answer-container img').attr('src', ADMIN_URL + val.response_wrong_answer_file);
+						// 	$('.response-answer-content').html(val.response_wrong_answer);
+						// }
 
 						// jika response jawaban berupa text
-						if (val.response_wrong_answer && !val.response_wrong_answer_file) {
-							$('.main-response-answer').removeClass('d-none');
-							$('.image-response-answer-container').addClass('d-none');
-							$('.response-answer-content').html(val.response_wrong_answer);
-						}
+						// if (val.response_wrong_answer && !val.response_wrong_answer_file) {
+						// 	$('.main-response-answer').removeClass('d-none');
+						// 	$('.image-response-answer-container').addClass('d-none');
+						// 	$('.response-answer-content').html(val.response_wrong_answer);
+						// }
 					}, 3000);
 
 				}

@@ -1,5 +1,5 @@
 <div class="row mt-3">
-	<div class="col"><img width="150" src="<?= base_url() ?>assets/themes/<?= isset($_SESSION['themes']) ? $_SESSION['themes'] : 'space' ?>/images/logowowedu.png" alt=""></div>
+	<div class="col"><img width="150" src="<?= base_url() ?>assets/themes/<?= isset($_SESSION['themes']) ? $_SESSION['themes'] : 'space' ?>/images/logowoowedu.png" alt=""></div>
 	<div class="col text-end">
 		<span style="font-size: 16px; font-weight: 600; display: block;"><?= $exam_header['title'] ?></span>
 		<span style="font-size: 12px; display: block;"><?= $exam_header['subject_name'] ?> - <?= $exam_header['class_name'] ?></span>
@@ -53,7 +53,7 @@
 					} elseif ($detail['type'] == 4) {
 						$jenisSoal = '<i class="fa-regular fa-square"></i> Isi Yang Kosong';
 					} elseif ($detail['type'] == 5) {
-						$jenisSoal = '<i class="fa-regular fa-square"></i> Menjodohkan';
+						$jenisSoal = '<i class="fas fa-layer-group"></i> Menjodohkan';
 					} elseif ($detail['type'] == 6) {
 						$jenisSoal = '<i class="fa-solid fa-hand"></i> Seret Lepas';
 					}
@@ -179,10 +179,31 @@
 							}
 							?>
 
+							<!-- KONDISI JIKA SOAL PAIRING -->
+							<?php if ($detail['type'] == 5) : ?>
+								<div class="row mt-3">
+									<?php foreach ($detail['pairing'] as $key => $val_key) : ?>
+										<div class="col-6">
+											<?php if ($val_key['has_image']) : ?>
+												<img src="<?= $this->config->item('admin_url') ?><?= $val_key['answer_key'] ?>" class="img-fluid img-question mb-2" width="100" alt="Gambar Soal">
+											<?php else : ?>
+												<p class="d-inline-block"><?= $val_key['answer_key'] ?></p>
+											<?php endif ?>
+
+											<span class="ms-2 me-2">&#8594;</span>
+
+											<span><?= $val_key['answer_value'] ?></span>
+										</div>
+									<?php endforeach ?>
+								</div>
+
+							<?php endif ?>
+
+
 							<!-- KONDISI JIKA SOAL DRAG & DROP -->
 							<?php if ($detail['type'] == 6) : ?>
 								<?php foreach ($detail['drag_drop'] as $key => $val) : ?>
-									<span class="drag-drop-answer me-3"><i class="fa fa-dot-circle-o me-2"></i><?= $val['answer_correct'] ?></span>
+									<span class="drag-drop-answer me-3"><i class="fa fa-dot-circle-o me-2"></i><?= $val['answer'] ?></span>
 								<?php endforeach ?>
 							<?php endif ?>
 						</div>
