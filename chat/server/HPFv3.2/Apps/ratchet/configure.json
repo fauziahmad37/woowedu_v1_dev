@@ -1,0 +1,28 @@
+{
+	"databases": [
+		{
+			"host": "127.0.0.1",
+			"database": "",
+			"username": "",
+			"password": ""
+		}
+	],
+	"constants": [
+		{
+			"HOST": "103.123.63.161"
+		},
+		{
+			"PORT": 45100
+		},
+		{
+			"SSL_CERT": "/path/to/ssl/ssl.crt"
+		},
+		{
+			"SSL_KEY": "/path/to/ssl/ssl.key"
+		}
+	],
+	"miscs": [
+		"asset_loader.php"
+	],
+	"headers": []
+}
