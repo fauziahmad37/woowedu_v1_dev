@@ -37,12 +37,12 @@ assets/package-lock.json
 assets/node_modules/*
 assets/files/*
 assets/images/ebooks/*
-assets/libs/amcharts5/*
-assets/libs/pdfjs-dist/*
-assets/libs/quilljs/*
-assets/libs/select2/*
-assets/libs/sweetalert2/*
-assets/libs/tinymce/*
+# assets/libs/amcharts5/*
+# assets/libs/pdfjs-dist/*
+# assets/libs/quilljs/*
+# assets/libs/select2/*
+# assets/libs/sweetalert2/*
+# assets/libs/tinymce/*
 
 admin/application/config/database.php
 /admin/application/logs/*
