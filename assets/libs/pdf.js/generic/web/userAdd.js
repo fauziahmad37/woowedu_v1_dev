@@ -115,11 +115,69 @@ formUserNote.addEventListener('submit', async e => {
 });
 
 btnCloseBook.addEventListener('click', e => {
-    window.parent.location.href = `${url.href}/ebook/close_book?id=${urlParams['id']}&last_page=${PDFViewerApplication.page}`;
+
+		let read_status = 1;
+		if(PDFViewerApplication.page == PDFViewerApplication.pdfViewer._pages.length) {
+			read_status = 2;
+		}
+   
+		// update read status
+		let xhr = new XMLHttpRequest();
+		// xhr.open('GET', `${url.href}/ebook/close_book?id=${urlParams['id']}&last_page=${PDFViewerApplication.page}`, false);
+		xhr.open('GET', `${url.href}/api/Api_my_ebook/updateReadStatus?ebook_id=${urlParams['my_ebook_id']}&read_status=${read_status}`, false);
+		xhr.send();
+
+		// update last page
+		xhr = new XMLHttpRequest();
+		xhr.open('GET', `${url.href}/api/Api_my_ebook/updateLastPage?ebook_id=${urlParams['my_ebook_id']}&last_page=${PDFViewerApplication.page}`, false);
+		xhr.send();
+		
+		window.parent.location.href = `${url.href}/ebook/close_book?id=${urlParams['id']}&last_page=${PDFViewerApplication.page}`;
 });
 
 
 // need to load when page is ready
 PDFViewerApplication.eventBus.on('pagesloaded', e => {
     PDFViewerApplication.page = parseInt(urlParams.lastPage);
+});
+
+window.onbeforeunload = function(event) {
+  let read_status = 1;
+		if(PDFViewerApplication.page == PDFViewerApplication.pdfViewer._pages.length) {
+			read_status = 2;
+		}
+   
+		// update read status
+		let xhr = new XMLHttpRequest();
+		// xhr.open('GET', `${url.href}/ebook/close_book?id=${urlParams['id']}&last_page=${PDFViewerApplication.page}`, false);
+		xhr.open('GET', `${url.href}/api/Api_my_ebook/updateReadStatus?ebook_id=${urlParams['my_ebook_id']}&read_status=${read_status}`, false);
+		xhr.send();
+
+		// update last page
+		xhr = new XMLHttpRequest();
+		xhr.open('GET', `${url.href}/api/Api_my_ebook/updateLastPage?ebook_id=${urlParams['my_ebook_id']}&last_page=${PDFViewerApplication.page}`, false);
+		xhr.send();
+
+		window.parent.location.href = `${url.href}/ebook/close_book?id=${urlParams['id']}&last_page=${PDFViewerApplication.page}`;
+};
+
+document.addEventListener("keydown", function (e) {
+    // Cegah Ctrl + Alt + F4
+    if (e.ctrlKey && e.altKey && e.key === "F4") {
+        e.preventDefault();
+        alert("⚠️ Kombinasi Ctrl + Alt + F4 diblokir!");
+    }
+
+    // Cegah PrintScreen (PrtSc)
+    if (e.key === "PrintScreen") {
+        e.preventDefault();
+        alert("⚠️ Screenshot dengan PrintScreen diblokir!");
+    }
+
+		// Cek kalau user menekan CTRL + S
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault(); // blokir aksi default (save page)
+        alert("Fitur save page diblokir!");
+    }
+
 });

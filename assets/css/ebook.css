@@ -59,3 +59,13 @@
 	background-color: DodgerBlue !important;
 	color: #ffffff;
 }
+
+.komentar-testi {
+	font-size: 12px;
+	line-height: 1.5;
+	color: #333;
+	display: -webkit-box;
+	-webkit-line-clamp: 8;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}

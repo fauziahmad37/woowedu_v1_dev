@@ -151,11 +151,11 @@
 
 .step.pending.noncompleted .step-number::before {
 	content: '\25cf';
-	font-size: 26px;
+	font-size: 19px;
 	color: #28a745;
 	position: absolute;
-	top: -13px;
-	left: 0px;
+	/* top: -13px; */
+	/* left: 0px; */
 }
 
 .btn-vuocher:hover {

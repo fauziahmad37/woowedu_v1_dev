@@ -1,13 +1,15 @@
 {
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.2",
     "daterangepicker": "^3.1.0",
-    "handlebars": "^4.7.8",
+	"handlebars": "^4.7.8",
     "moment": "^2.29.4",
     "pagination-system": "^2.0.2",
     "pdfjs-dist": "^3.11.174",
-    "sortablejs": "^1.15.6",
+	"sortablejs": "^1.15.6",
     "sweetalert2": "^11.10.6"
   },
   "devDependencies": {
