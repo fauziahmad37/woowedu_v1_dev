@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "cbceb004-e4a9-4f5c-852b-b3b5d40cef3d",
+		"name": "WOOWEDU NOTIFICATION",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5120635",
+		"_collection_link": "https://winter-shadow-491416.postman.co/workspace/My-Workspace~22aa32f5-2668-4376-8f0d-ced1bbb10703/collection/5120635-cbceb004-e4a9-4f5c-852b-b3b5d40cef3d?action=share&source=collection_link&creator=5120635"
+	},
+	"item": [
+		{
+			"name": "MESSAGE",
+			"item": [
+				{
+					"name": "MESSAGE - GENERATE BEARER TOKEN",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/message/generate-token",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"message",
+								"generate-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MESSAGE - SEND NOTIFICATION MESSAGE",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/message/send?user_token=c1gwdZgyQPi3XpsEqDc1Rc:APA91bGQXEfXuDSB0E5R2HA52587uCVIW9vTcv0s6pmPAFlFuVFaDGv5zDiQIhoK6TtTuIMKODFXLXv8uOtzbjEDVDyIjyInjlSRYf9hAEY0nP1Ujzbpyog&title=Judul&body=Isi notif",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"message",
+								"send"
+							],
+							"query": [
+								{
+									"key": "user_token",
+									"value": "c1gwdZgyQPi3XpsEqDc1Rc:APA91bGQXEfXuDSB0E5R2HA52587uCVIW9vTcv0s6pmPAFlFuVFaDGv5zDiQIhoK6TtTuIMKODFXLXv8uOtzbjEDVDyIjyInjlSRYf9hAEY0nP1Ujzbpyog"
+								},
+								{
+									"key": "title",
+									"value": "Judul"
+								},
+								{
+									"key": "body",
+									"value": "Isi notif"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MESSAGE - INSERT MONGODB NOTIFICATION MESSAGE",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id_creator\": 1,\n  \"module\": \"tugas\",\n  \"start_datetime\": \"07052025 8:58:00\",\n  \"end_datetime\": \"07052025 9:58:00\",\n  \"payload\": \"Kelas IPA akan dimulai pukul 08.00. Jangan sampai terlambat ya!\",\n  \"receiver\": [{\n    \"user_id\": 1,\n    \"firebase_token\": \"abababab\"\n  }]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/message/manage/notification",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"message",
+								"manage",
+								"notification"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "USER",
+			"item": [
+				{
+					"name": "USER - UPDATE DEVICE TOKEN",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/user/update_device_token?username=202406010002&token_device=c1gwdZgyQPi3XpsEqDc1Rc:APA91bGQXEfXuDSB0E5R2HA52587uCVIW9vTcv0s6pmPAFlFuVFaDGv5zDiQIhoK6TtTuIMKODFXLXv8uOtzbjEDVDyIjyInjlSRYf9hAEY0nP1Ujzbpyog",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"user",
+								"update_device_token"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "202406010002"
+								},
+								{
+									"key": "token_device",
+									"value": "c1gwdZgyQPi3XpsEqDc1Rc:APA91bGQXEfXuDSB0E5R2HA52587uCVIW9vTcv0s6pmPAFlFuVFaDGv5zDiQIhoK6TtTuIMKODFXLXv8uOtzbjEDVDyIjyInjlSRYf9hAEY0nP1Ujzbpyog"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "USER - GET ALL USER",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/users",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "USER - GET USER BY USERNAME",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/users?username=202406010002",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "202406010002"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "NOTIFICATION",
+			"item": [
+				{
+					"name": "NOTIFICATION - GET ALL NOTIFICATION",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/notification",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"notification"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOTIFICATION - GET ALL NOTIFICATION BY USER ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/notification?user_id=83",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"notification"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "83"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "NOTIFICATION - UPDATE SEEN NOTIFICATION BY NOTIFICATION ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://{{host}}:{{port}}/v1/notification/seen?notif_id=2061&seen=false",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"v1",
+								"notification",
+								"seen"
+							],
+							"query": [
+								{
+									"key": "notif_id",
+									"value": "2061"
+								},
+								{
+									"key": "seen",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "192.168.1.233",
+			"type": "string"
+		},
+		{
+			"key": "port",
+			"value": "8085",
+			"type": "string"
+		}
+	]
+}

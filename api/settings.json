@@ -1,0 +1,63 @@
+{
+  "SERVICE": {
+    "MQTT": {
+      "MQTT_NAME": "woowedu-fcm",
+      "MQTT_PORT": 8443,
+      "MQTT_HOST": "mqtt.woowedu-fcm.com",
+      "MQTT_TOPIC": {
+        "LOGS_TOPIC": "woowedu-fcm/logs/"
+      }
+    },
+    "WEBSOCKET": {
+      "WS_NAME": "woowedu-fcm",
+      "WS_PORT": 6969,
+      "WS_HOST": "0.0.0.0",
+      "WS_TOPIC": {
+        "LOGS_TOPIC": "woowedu-fcm/logs/"
+      },
+      "WS_MAX_RETRIES": 10,
+      "WS_RETRIES_INTERVAL": 2
+    }
+  },
+  "SERVER": {
+    "SERVER_HOST": "127.0.0.1",
+    "SERVER_PORT": 8085,
+    "PRODUCTION": "true",
+    "DEBUG": "true",
+    "PREFIX": "http",
+    "ALL_IP": "0.0.0.0",
+    "CERTFILE": "/etc/letsencrypt/live/woowedu-fcm.com/fullchain.pem",
+    "KEYFILE": "/etc/letsencrypt/live/woowedu-fcm.com/privkey.pem",
+    "SALT_KEY": "@8CD3FGH1JKLMN0PQR5TUvDouBlEY0uXW4YZ",
+    "PUBLIC_URL": "http://192.168.1.233",
+    "PROJECT": "woowedu-fcm-API",
+    "USING_JWT": "false",
+    "FTP_DOMAIN": "/var/www/html/cdn.woowedu-fcm.com/"
+  },
+  "DATABASE": {
+    "MYSQL" : {
+      "DB_HOST": "127.0.0.1",
+      "DB_USER": "admin",
+      "DB_PASSWORD": "180599",
+      "DB_DATABASE": "example_db"
+    },
+    "MONGODB": {
+      "MONGO_HOST": "127.0.0.1",
+      "MONGO_PORT": 27017,
+      "MONGO_DB": "woowedu-fcm-mongodb"
+    },"POSTGRESQL" : {
+      "DB_HOST": "127.0.0.1",
+      "DB_USER": "postgres",
+      "DB_PASSWORD": "Bakw4nJagung##",
+      "DB_DATABASE": "woowedu"
+    }
+  },
+   "SERIAL": {
+        "SERIAL_PORT": "COM4",
+        "SERIAL_BAUDRATE": 9600
+    },
+  "SCHEDULER": {
+    "TIME_DELAY": 1,
+    "TIME_TYPE": "minutes"
+  }
+}
