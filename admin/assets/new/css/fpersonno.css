@@ -1,0 +1,31 @@
+.bg-purple {
+    background-color: var(--purple);
+    color: var(--white);
+}
+
+.bg-pink {
+    background-color: var(--pink);
+    color: var(--white);
+}
+
+.bg-orange {
+    background-color: var(--orange);
+    color: var(--white);
+}
+
+.dataTables_filter, .dataTables_info, .dataTables_length {
+    display: none;
+}
+
+/*.dataTables_wrapper {
+    min-height: 300px;
+}*/
+
+.text-shadow {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, .5);
+}
+
+.form-control:disabled, .form-control[readonly] {
+    background-color: #e1e1e1;
+    cursor:default;
+}

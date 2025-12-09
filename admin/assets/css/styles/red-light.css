@@ -1,0 +1,13 @@
+/*
+Woow VMS Red Light Style
+*/
+ul#sidenav li.red, header nav.red, main .card .red, footer .red, nav.red {
+	background-color: red !important;
+}
+.userView {
+	background:red !important;
+}
+ul#sidenav li a.hello {
+	color:#000000 !important;
+	font-size:120% !important;
+}

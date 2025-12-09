@@ -1,0 +1,318 @@
+body {
+	overflow: auto !important;
+}
+
+.bg-primary-300 {
+	background-color: var(--bs-primary-300) !important;
+}
+
+.bg-primary-600 {
+	background-color: var(--bs-primary-600) !important;
+}
+
+.breadcrumb {
+	display: none;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+label {
+	font-size: 14px;
+	font-weight: 500;
+	color: #74788D;
+	line-height: 21px;
+}
+
+.form-select {
+	border: 1px solid #D4D1E9;
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 14px;
+	color: #74788D;
+}
+
+.form-control {
+	border: 1px solid #D4D1E9;
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 14px;
+	color: #74788D;
+}
+
+.dropdown-toggle::after {
+	display: none;
+}
+
+.dropdown-menu {
+	min-width: 100px;
+	border-width: 0px;
+	border-radius: 5px;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.multiple-choice-answer .form-check-input, 
+.tof-answer .form-check-input {
+	width: 22px !important;
+	height: 22px !important;
+}
+
+.img-question,
+.img-question-choice {
+	max-width: 150px;
+}
+
+.bg-custom-assesment {
+	background-color: var(--bs-primary-border-subtle);
+}
+
+.soal-pilihan-ganda-container, 
+.soal-fill-the-blank-container, 
+.soal-true-or-false-container {
+	height: 100%;
+	width: 100%;
+	z-index: 101;
+	position: absolute;
+	background-color: var(--bs-primary-bg-subtle);
+	left: 0;
+	top: 0;
+}
+
+:is(#mdl-add-pairing, #mdl-add-dragdrop) .btn.btn-back {
+	--bs-btn-padding-x: 0;
+	--bs-btn-padding-y: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 32px;
+	width: 32px;
+}
+
+.img-file-add-container  {
+	outline: 1px solid var(--bs-white);
+}
+
+.input-question, .input-answer {
+	color: var(--bs-white);
+	border: none;
+	outline: none;
+	text-wrap: wrap;
+	text-align: center;
+	background-color: transparent;
+}
+
+:is(.input-question, .input-answer)::placeholder {
+	color: var(--bs-white);
+	text-align: center;
+}
+
+.bg-box-container {
+	background-color: var(--bs-primary-400);
+}
+
+.box-question {
+	padding: .5rem;
+	border-radius: 8px;
+}
+
+.box-question .box-question-header { 
+	padding-bottom: .5rem; 
+	display: flex;
+	align-items: center;
+}
+
+.box-question .box-question-header .btn {
+	--bs-btn-padding-y: 0;
+	--bs-btn-padding-x: 0;
+	height: 25px;
+	width: 25px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: none;
+	background-color: var(--bs-primary-border-subtle);
+}
+
+.box-question .box-question-body {
+	border: 1px dashed var(--bs-white);
+	height: 120px;
+	border-radius: 8px;
+}
+
+.img-preview img {
+	text-indent: -1000px;
+}
+
+.preview-overlay {
+	visibility: hidden;
+	opacity: 0;
+	transition: all 500ms linear;
+}
+
+.img-preview:hover > .preview-overlay {
+	visibility: visible;
+	opacity: 1;
+	transition: all 500ms linear;
+}
+
+
+.box-answer {
+	height: 120px;
+	border-radius: 8px;
+}
+
+:is(.input-question, .input-answer):focus,
+:is(.input-question, .input-answer):not(:placeholder-shown) {
+	background-color: var(--bs-primary-600);
+}
+
+.btn-check:checked + .btn {
+	background-color: var(--bs-primary-300);
+}
+
+dialog#mdl-pairing-config {
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	border: 1px solid var(--bs-gray-400);
+	width: 650px;
+	overflow: auto;
+	border-radius: 8px;
+}
+
+.list-soal-container-ol.list-group-numbered > li.list-group-item::before {
+	content: "Soal " counter(section) ".";
+	counter-increment: section;
+	position: absolute;
+	top: 1.2rem;
+	left: 1.2rem;
+	margin-top: 1rem;
+	border: 1px solid var(--bs-gray-400);
+	border-radius: var(--bs-border-radius-lg);
+	padding: .5rem 1rem;
+	background-color: var(--bs-light);
+}
+
+.list-soal-container-ol.list-group-numbered > li:last-child {
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.btn-group-pairing-hidden:hover {
+	opacity: 1;
+	transition: opacity 500ms ease-in-out;
+}
+.btn-group-pairing-hidden {
+	background-color: var(--bs-white);
+	opacity: 0;
+	height: 100%;
+	width: 100%;
+	transition: opacity 500ms ease-in-out;
+}
+
+.btn.btn-group-pairing-shown > button:disabled {
+	--bs-btn-color: #000;
+	color: var(--bs-btn-color);
+}
+
+/* DRAG AND DROP */
+#dragdrop-question-container:focus-within, 
+#dragdrop-question-container:has(#dragdrop-question-text:not(:empty)) {
+	background-color: var(--bs-primary-600);
+}
+
+#dragdrop-question-text {
+	overflow: hidden;
+	text-wrap: wrap;
+	text-wrap-mode: wrap;
+	word-wrap: break-word;
+	vertical-align: middle;
+}
+
+#dragdrop-question-text[contenteditable=true]:empty:not(:focus)::before {
+	content: attr(placeholder);
+	pointer-events: none;
+	display: block; /* For Firefox */
+}
+
+#dragdrop-question-text:focus-visible {
+	outline: none;
+	border: none;
+}
+
+.dragdrop-answer {
+	height: 260px;
+}
+
+.input-text-answer {
+	min-height: 28px;
+	max-height: 100%;
+	display: inline-block;
+}
+
+#dragdrop-question-tag, #dragdrop-input-false-answer-container {
+	width: 180px;
+	padding-top: .25rem;
+	padding-bottom: .25rem;
+	border-radius: var(--bs-border-radius);
+}
+
+:is(#dragdrop-question-tag, #dragdrop-input-false-answer-container) > span {
+	width: 100%;
+}
+
+:is(#dragdrop-question-tag, #dragdrop-input-false-answer-container) > span > input:focus-visible {
+	outline: none;
+}
+
+#ok-question-tag, #cancel-question-tag { 
+	height: 100%;
+	font-size: 1rem;
+}
+
+:is(#dragdrop-question-tag, #dragdrop-input-false-answer-container) > button {
+	width: 100%;
+	line-height: 1.2rem;
+	border: none;
+	color: var(--bs-white);
+	cursor: pointer;
+}
+
+#dragdrop-question-inner-container {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+#dragdrop-answer-correct:has(.tag-container:not(:empty)) {
+	background-color: var(--bs-primary-600);
+}
+
+#dragdrop-config-ul {
+	--bs-list-group-item-padding-y: 1rem;
+	border-bottom-left-radius: var(--bs-border-radius);
+	border-bottom-right-radius: var(--bs-border-radius);
+}
+
+#dragdrop-response-answer {
+	transform: scaleY(0);
+	transform-origin: bottom;
+	height: 55px;
+	transition: transform 500ms ease-in-out;
+}
+
+#dragdrop-response-answer.show {
+	transform: scaleY(100%);
+	transform-origin: bottom;
+	transition: transform 500ms ease-in-out;
+}
+
+#dragdrop-response-back {
+	line-height: 1;
+}
+
+#dragdrop-clear-response-answer {
+	height: 38px;
+	width: 38px;
+	line-height: normal;
+}
+

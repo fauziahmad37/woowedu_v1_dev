@@ -1,0 +1,39 @@
+<?php
+
+class Exam extends MY_Controller {
+
+    public function __construct()
+    {
+        parent::__construct();
+        check_Loggin();
+        $this->load->model(['model_common', 'model_materi']); 
+		$this->load->helper('url');
+		$this->load->helper('slug');
+		$this->load->helper('assets');	
+		$lang = ($this->session->userdata('lang')) ? $this->session->userdata('lang') : config_item('language');
+		$this->lang->load('message', $lang);
+		$this->load->library('csrfsimple');
+    }
+
+    public function index() {
+        $data['pageTitle']	= 'Data Soal';
+		//$data['tableName']	= 'tbl_device';
+		$data['csrf_token']	= $this->csrfsimple->genToken();
+		$data['page_js']	= [  
+			['path' => 'assets/node_modules/bootstrap-select/dist/js/bootstrap-select.min.js', 'defer' => true],
+			['path' => 'assets/new/libs/summernote/summernote-bs4.min.js', 'defer' => true],
+			['path' => 'assets/new/libs/daterangepicker-master/moment.min.js', 'defer' => true],
+			['path' => 'assets/new/libs/daterangepicker-master/daterangepicker.js', 'defer' => true],
+			['path' => 'assets/new/libs/randomString.js', 'defer' => true],
+			['path' => 'assets/new/js/pages/_ujian.js', 'defer' => true],
+		]; 
+		$data['page_css']	= [  
+			'assets/node_modules/bootstrap-select/dist/css/bootstrap-select.min.css',
+            'assets/new/libs/summernote/summernote-bs4.min.css',
+			'assets/new/libs/daterangepicker-master/daterangepicker.css',
+			'assets/new/css/fpersonno.css'
+		]; 
+ 
+		$this->template->load('template', 'exam/index', $data);
+    }
+}

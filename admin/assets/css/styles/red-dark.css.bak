@@ -1,0 +1,25 @@
+/*
+Woow VMS Red Dark Style
+*/
+ul#sidenav li.red, header nav.red, main .card .red, footer .red, nav.red {
+	background-color: red !important;
+}
+.userView {
+	background:red !important;
+}
+ul#sidenav li a.hello {
+	color:#ffffff !important;
+	font-size:120% !important;
+}
+ul#sidenav {
+	background-color:#1e282c !important;
+}
+ul#sidenav li a, ul#sidenav li i {
+	color:#b8c7ce !important;
+}
+ul#sidenav div.divider {
+	display:none !important;
+}
+.subheaderblock {
+	background-color:#1a2226 !important;
+}

@@ -1,0 +1,317 @@
+@import '../../../scss/bootstrap/functions';
+
+$color-base: #281B93; 
+
+$primary-100: tint-color($color-base, 80%) !default;
+$primary-200: tint-color($color-base, 60%) !default;
+$primary-300: tint-color($color-base, 40%) !default;
+$primary-400: tint-color($color-base, 20%) !default;
+$primary-500: $color-base !default;
+$primary-600: shade-color($color-base, 20%) !default;
+$primary-700: shade-color($color-base, 40%) !default;
+$primary-800: shade-color($color-base, 60%) !default;
+$primary-900: shade-color($color-base, 80%) !default;
+
+:root {
+    --header-height: 3rem;
+    --nav-width: 280px;
+    --first-color: #4723D9;
+    --first-color-light: #AFA5D9;
+    --white-color: #F7F6FB;
+    --body-font: 'Poppins', sans-serif;
+    --normal-font-size: 1rem;
+    --z-fixed: 100;
+    --gray-600: #6C757D;
+    --bs-primary-100: #{$primary-100};
+    --bs-primary-200: #{$primary-200};
+    --bs-primary-300: #{$primary-300};
+    --bs-primary-400: #{$primary-400};
+    --bs-primary-500: #{$primary-500};
+    --bs-primary-600: #{$primary-600};
+    --bs-primary-700: #{$primary-700};
+    --bs-primary-800: #{$primary-800};
+    --bs-primary-900: #{$primary-900};
+}
+
+body {
+    position: relative;
+    /* margin: var(--header-height) 0 0 0; */
+    padding: 0 1rem;
+    font-family: var(--body-font) !important;
+    font-size: var(--normal-font-size);
+    transition: .5s
+}
+
+.header {
+    width: 100%;
+    height: var(--header-height);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    background-color: var(--white-color);
+    z-index: var(--z-fixed);
+    transition: .5s
+}
+
+.header_toggle {
+    color: var(--first-color);
+    font-size: 1.5rem;
+    cursor: pointer
+}
+
+.header_img {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden
+}
+
+.header_img img {
+    width: 40px
+}
+
+.sidebar-icon {
+    width: 50px;
+    padding-top: 4px;
+    padding-left: 20px;
+}
+
+.l-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--nav-width);
+    height: 100vh;
+    background-color: var(--first-color);
+    padding: 0px 0px 0px 0px;
+    transition: .5s;
+    z-index: var(--z-fixed);
+    background: var(--sidebar-bg);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+.nav_logo {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    align-items: center;
+    column-gap: 1rem;
+    padding: .5rem 0 .5rem 1.5rem
+}
+
+.nav_logo {
+    margin-bottom: 2rem;
+    margin-top: 0px;
+}
+
+.nav_logo-icon {
+    font-size: 1.25rem;
+    color: var(--white-color)
+}
+
+.nav_logo-name {
+    color: var(--white-color);
+    font-weight: 700
+}
+
+.nav_link {
+    position: relative;
+    color: var(--white-color);
+    margin-bottom: 1.5rem;
+    transition: .3s;
+}
+
+.nav_link:hover {
+    color: var(--white-color);
+}
+
+.nav_icon {
+    font-size: 1em;
+}
+
+.nav_top {
+    background-color: white; 
+    justify-content: space-between;
+    position: sticky;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 0.5rem 1rem;
+    padding-top: 20px;
+}
+
+.l-navbar.show {
+    left: 0
+}
+
+.body-pd {
+    padding-left: calc(var(--nav-width) + 1rem)
+}
+
+
+
+
+.p-nav {
+    padding-top: 10px;
+    color: var(--white-color);
+    padding-left: 20px;
+    font-size: 1em;
+    width: 200px;
+}
+
+.btn-logout{
+    width: 200px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: white;
+    margin-bottom: 40px;
+    margin-left: 40px;
+    margin-right: 40px;
+    border-radius: 6px;
+}
+
+.btn-logout:hover{
+    background-color: white;
+}
+
+.p-header{
+    font-size: 16px;
+    color: var(--gray-600);
+}
+
+.p2-header{
+    font-size: 24px;
+    font-weight: 600px;
+    color: black;
+}
+
+.content-wrapper{
+    padding-top: 40px;
+}
+
+@media screen and (min-width: 576px) {
+
+	.icon-menu {display: inline;}
+	.close-menu {display: inline;}
+
+    body {
+        /* margin: calc(var(--header-height) + 1rem) 0 0 0; */
+        padding-left: calc(var(--nav-width) + 2rem)
+    }
+
+    .header {
+        height: calc(var(--header-height) + 1rem);
+        padding: 0 2rem 0 calc(var(--nav-width) + 2rem)
+    }
+
+    .header_img {
+        width: 40px;
+        height: 40px
+    }
+
+    .header_img img {
+        width: 45px
+    }
+
+    /* .l-navbar {
+		display: none;
+        left: 0;
+        padding: 0px 0px 0px 0px;
+    } */
+
+	/* .l-navbar .nav {
+		display: none;
+	} */
+
+    /* .l-navbar.show {
+        width: calc(var(--nav-width) + 156px)
+    } */
+
+    /* #body-pd {
+       padding-left: calc(var(--nav-width) + 20px)
+    } */
+
+	#btn-menu {
+		display: none;
+	}
+
+	#btn-close-menu{
+		display: none;
+	}
+}
+
+@media screen and (max-width: 576px) {
+
+	/* .l-navbar {
+		display: none;
+    } */
+
+	/* .l-navbar .nav {
+		display: none;
+	} */
+}
+
+.card-success {
+    background-color: var(--bs-success-border-subtle);
+}
+
+.card-success .date-news-card {
+    background-color: var(--bs-success);
+    color: var(--bs-light);    
+}
+
+.card-warning {
+    background-color: var(--bs-warning-border-subtle);
+}
+
+.card-warning .date-news-card {
+    background-color: var(--bs-warning);
+    color: var(--bs-light);
+}
+
+.card-danger {
+    background-color: var(--bs-danger-border-subtle);
+}
+
+.card-danger .date-news-card {
+    background-color: var(--bs-danger);
+    color: var(--bs-light);
+}
+
+.card-info {
+    background-color: var(--bs-info-border-subtle);
+}
+
+.card-info .date-news-card {
+    background-color: var(--bs-info);
+    color: var(--bs-light);
+}
+
+:is(.card-success, .card-info, .card-warning, .card-danger),
+:is(.card-success, .card-info, .card-warning, .card-danger) a {
+    color: var(--bs-dark);
+}
+
+.input-group-text-transparent {
+    border-left: 0;
+    background-color: transparent;
+}
+
+@media screen and (max-height: 530px) {
+	.l-navbar {
+		height: 600px !important;
+	}
+
+	.l-navbar .nav {
+		overflow-y: auto;
+		height: 600px !important;
+		overflow-x: hidden;
+	}
+}

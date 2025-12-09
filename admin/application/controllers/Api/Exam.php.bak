@@ -1,0 +1,206 @@
+<?php
+
+class Exam extends MY_Controller {
+
+    public function __construct() {
+        parent::__construct();
+        check_Loggin();
+        $this->load->model(['model_common', 'model_exam']);
+		$this->load->model(['Model_settings']);
+		$this->load->library(['csrfsimple', 'curl']);
+        $this->load->helper('url');
+		$this->load->helper(['slug', 'tgl']);
+		$lang = ($this->session->userdata('lang')) ? $this->session->userdata('lang') : config_item('language');
+		$this->lang->load('message', $lang);
+    }
+
+    public function getAll() {
+        $draw = $this->input->get('draw');
+        $limit = $this->input->get('length');
+        $offset = $this->input->get('start');
+        $filters = $this->input->get('columns');
+
+        $data = $this->model_exam->getAll($filters, $limit, $offset);
+
+        $datas = [
+            'draw' => $draw,
+            'data' => $data,
+            'recordsTotal' => $this->db->count_all_results('exam'),
+            'recordsFiltered' => $this->model_exam->countAll($filters)
+        ];
+
+        echo json_encode($datas, JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+
+
+    public function save() {
+        $code = trim($this->input->post('a_exam_code', TRUE));
+        $kelas = trim($this->input->post('a_exam_class', TRUE));
+        $mapel = trim($this->input->post('a_exam_subject', TRUE));
+        $start = trim($this->input->post('a_exam_start', TRUE));
+        $end = trim($this->input->post('a_exam_end', TRUE));
+        $duration = intval(trim($this->input->post('a_exam_duration')));
+
+        header('Content-Type: application/json');
+
+        if(empty($code) || empty($kelas) || empty($mapel) || empty($start) || empty($end)) 
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required')];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+
+        if(!validateDate($start, 'Y-m-d H:i:s') && !validateDate($end, 'Y-m-d H:i:s'))
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => 'Data yang di input tidak valid'];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+
+        if($this->db->get_where('exam', ['code' => $code])->num_rows() > 0)
+        {
+            http_response_code(422);
+            $m = [
+                'err_status' => 'error', 
+                'message' => $this->lang->line('acc_ctrl_common').' '.$this->lang->line('woow_is_exists')
+            ];
+            exit(json_encode($m, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG));
+        }
+
+        $checkIntersect = $this->model_exam->getDateBetween($kelas, $mapel, $start, $end);
+
+        if($checkIntersect->num_rows() > 0)
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => 'Periode ber-irisan dengan ujian lain !!!, harap merubah jangka waktu ujian'];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+        // if duration is NULL or 0 then duration is interval hours between start_time and end_time
+        $_durasi = empty($duration) ? (new DateTime($end))->diff(new DateTime($start))->format("%h") : $duration;
+
+        $data = [
+            'code'          => $code,
+            'class_id'      => $kelas,
+            'subject_id'    => $mapel,
+            'start_date'    => (new \DateTime($start))->format('Y-m-d H:i:s'),
+            'end_date'      => (new \DateTime($end))->format('Y-m-d H:i:s'),
+            'duration'      => $_durasi
+        ];
+
+        if(!$this->db->insert('exam', $data))
+        {
+            http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error')];
+			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+			return;
+        }
+
+        $_id = $this->db->insert_id();
+
+        http_response_code(200);
+		$msg = ['err_status' => 'success', 'message' => $this->lang->line('woow_form_success_exam'), 'exam_code' => $_id];
+		echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+		exit;
+    }
+
+    public function edit() {
+        $code = trim($this->input->post('a_exam_code', TRUE));
+        $kelas = trim($this->input->post('a_exam_class', TRUE));
+        $mapel = trim($this->input->post('a_exam_subject', TRUE));
+        $start = trim($this->input->post('a_exam_start', TRUE));
+        $end = trim($this->input->post('a_exam_end', TRUE));
+        $duration = intval(trim($this->input->post('a_exam_duration')));
+        $id = intval($this->input->post('a_id', TRUE));
+
+        header('Content-Type: application/json');
+        // empty validation
+        if(empty($code) || empty($kelas) || empty($mapel) || empty($start) || empty($end)) 
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required')];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+        // date validation
+        if(!validateDate($start, 'Y-m-d H:i:s') && !validateDate($end, 'Y-m-d H:i:s'))
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => 'Data yang di input tidak valid'];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+        // check unique for id
+        $this->db->where('exam_id <>', $id);
+        if($this->db->get_where('exam', ['code' => $code])->num_rows() > 0)
+        {
+            http_response_code(422);
+            $m = [
+                'err_status' => 'error', 
+                'message' => $this->lang->line('acc_ctrl_common').' '.$this->lang->line('woow_is_exists')
+            ];
+            exit(json_encode($m, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG));
+        }
+        // check if date is overlaps
+        $checkIntersect = $this->model_exam->getDateBetween($kelas, $mapel, $start, $end, $id);
+
+        if($checkIntersect->num_rows() > 0)
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => 'Periode ber-irisan dengan periode ujian lain !!!, harap merubah periode ujian'];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+
+         // if duration is NULL or 0 then duration is interval hours between start_time and end_time
+         $_durasi = empty($duration) ? (new DateTime($end))->diff(new DateTime($start))->format("%h") : $duration;
+
+        $data = [
+            'code'          => $code,
+            'class_id'      => $kelas,
+            'subject_id'    => $mapel,
+            'start_date'    => (new \DateTime($start))->format('Y-m-d H:i:s'),
+            'end_date'      => (new \DateTime($end))->format('Y-m-d H:i:s'),
+            'duration'      => $_durasi
+        ];
+        // update
+        if(!$this->db->update('exam', $data, ['exam_id' => $id]))
+        {
+            http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error')];
+			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+			return;
+        }
+
+        http_response_code(200);
+		$msg = ['err_status' => 'success', 'message' => $this->lang->line('woow_form_success')];
+		echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+		exit;
+    }
+
+    public function delete() {
+		header('Content-Type: application/json');
+
+        $_input = file_get_contents('php://input');
+        $input  = json_decode($_input, TRUE);
+
+        if($input['isBulk'] == 1)
+            $this->db->where_in('exam_id', $input['data']);
+        else
+            $this->db->where('exam_id', $input['data']);
+
+        if(!$this->db->delete('exam')) {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_delete_error')];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+            return;
+        }
+
+        http_response_code(200);
+        $msg = ['err_status' => 'success', 'message' => $this->lang->line('woow_delete_success')];
+        exit(json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT));
+	}
+
+}

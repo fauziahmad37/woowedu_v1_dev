@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@selectize/selectize": "^0.15.2",
+    "jstree": "^3.3.15"
+  },
+  "devDependencies": {
+    "bootstrap-select": "^1.13.18"
+  }
+}

@@ -1,0 +1,45 @@
+@import 'bootstrap/functions';
+@import 'bootstrap/variables';
+
+:root {
+    // BLUE
+    @each $name,$value in $blues {
+        --bs-#{$name}: #{$value};
+    };
+    // INDIGO
+    @each $name,$value in $indigos {
+        --bs-#{$name}: #{$value};
+    };
+    // PURPLE
+    @each $name,$value in $purples {
+        --bs-#{$name}: #{$value};
+    };
+    // PINKS
+    @each $name,$value in $pinks {
+        --bs-#{$name}: #{$value};
+    };
+    // RED
+    @each $name,$value in $reds {
+        --bs-#{$name}: #{$value};
+    };
+    // ORANGE
+    @each $name,$value in $oranges {
+        --bs-#{$name}: #{$value};
+    };
+    // YELLOWs
+    @each $name,$value in $yellows {
+        --bs-#{$name}: #{$value};
+    };
+    // GREENS
+    @each $name,$value in $greens {
+        --bs-#{$name}: #{$value};
+    };
+    // TEALS
+    @each $name,$value in $teals {
+        --bs-#{$name}: #{$value};
+    };
+    // TEALS
+    @each $name,$value in $cyans {
+        --bs-#{$name}: #{$value};
+    };
+}

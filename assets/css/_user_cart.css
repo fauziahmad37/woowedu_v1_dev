@@ -1,0 +1,8 @@
+
+img.cart-cover {
+    --default-height: 775px;
+    --default-width: 530px;
+    --substractor: 640px; 
+    height: calc(var(--default-height) - var(--substractor));
+    /* width: calc(var(--default-width) - var(--substractor)); */
+}

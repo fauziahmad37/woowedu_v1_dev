@@ -1,0 +1,15 @@
+.table {
+    max-width: fit-content;
+}
+
+.table > thead th  {
+    background-color: var(--bs-primary-rgb);
+    color: var(--bs-white);
+}
+
+.table td, .table th {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+} 

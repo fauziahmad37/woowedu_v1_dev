@@ -1,0 +1,32 @@
+.pdf-thumbnail-container {
+    --preview-height: 35px;
+    overflow: hidden;
+}
+
+.pdf-thumbnail-container > .pdf-page-preview {
+    left: 0;
+    background-color: rgba(var(--bs-dark-rgb), 0.4);
+    bottom: calc(-1 * var(--preview-height));
+    height: var(--preview-height);
+    transition: bottom 350ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.pdf-thumbnail-container:hover > .pdf-page-preview {
+    bottom: 0;
+    transition: bottom 350ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+#dialog-preview {
+    height: 560px;
+    z-index: 1200;
+    position: fixed;
+}
+
+#dialog-preview #dialog-body {
+    height: 480px;
+    overflow: auto;
+}
+
+.disabled-link {
+	pointer-events: none;
+}

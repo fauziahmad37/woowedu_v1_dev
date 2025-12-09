@@ -1,0 +1,3 @@
+table student field ta_aktif = 1 (status untuk yang sudah aktif)
+table student field ta_aktif = 5 (status untuk yang sudah lulus)
+table student field ta_aktif = 0 (status untuk yang baru mendaftar)

@@ -1,0 +1,7 @@
+
+#home-carousel {
+    background-image: var(--carousel-home-bg);
+    background-position: center center;
+    background-size: cover;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}

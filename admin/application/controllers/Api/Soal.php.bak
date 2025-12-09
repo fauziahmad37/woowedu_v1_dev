@@ -1,0 +1,254 @@
+<?php
+
+class Soal extends MY_Controller {
+
+    public function __construct() 
+	{
+		parent::__construct(); 
+		$this->load->model(['model_common', 'model_soal']);
+		$this->load->model(['Model_settings']);
+		$this->load->library(['csrfsimple', 'curl']);
+		$lang = ($this->session->userdata('lang')) ? $this->session->userdata('lang') : config_item('language');
+		$this->lang->load('message', $lang);
+	}
+
+    public function getAll() {
+        $draw   = $this->input->get('draw');
+        $limit  = $this->input->get('length');
+        $offset = $this->input->get('start');
+        $filters = $this->input->get('columns');
+
+        $data = $this->model_soal->getAll($filters, $limit, $offset);
+
+        $_data = [
+            'draw' => $draw,
+            'data' => $data,
+            'recordsTotal' => $this->db->count_all_results('soal'),
+            'recordsFiltered' => $this->model_soal->countAll($filters)
+        ];
+
+        echo json_encode($_data, JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+
+    public function save() {
+        $code = $this->input->post('a_soal_code', TRUE);
+        //$no = $this->input->post('a_soal_no', TRUE);
+        $mapel = $this->input->post('a_soal_subject', TRUE);
+        $class = $this->input->post('a_soal_class', TRUE);
+        $soal = $this->input->post('a_soal_detail', TRUE);
+        $type = $this->input->post('a_soal_type', TRUE);
+        $jawaban = $this->input->post('a_soal_answer', TRUE);
+        $pg = $this->input->post('pg');
+
+        $_data = [];
+
+        header('Content-Type: application/json');
+        
+        // empty validation
+        if(empty($code) || empty($mapel) || empty($class) || empty($soal) || empty($jawaban) || empty($type))
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required')];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+
+        $checkCode = $this->db->get_where('soal', ['code' => $code])->num_rows();
+        //$checkClassAndMapel = $this->db->get_where('soal', ['subject_id' => $mapel, 'class_id' => $class])->num_rows();
+
+        if($checkCode > 0)
+        {
+            http_response_code(422);
+            $m = [
+                'err_status' => 'error', 
+                'message' => $this->lang->line('acc_ctrl_common').' '.$this->lang->line('woow_is_exists')
+            ];
+            echo json_encode($m, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+        
+        if(!empty($_FILES['a_soal_file']['name']))
+        {
+            $_dir = 'assets'.DIRECTORY_SEPARATOR.'files'.DIRECTORY_SEPARATOR.'soal'.DIRECTORY_SEPARATOR.$code;
+            
+            if(!file_exists($_dir))
+                @mkdir(FCPATH.$_dir, 0777, TRUE);
+            
+            // get type
+            $ext = pathinfo(basename($_FILES['a_soal_file']['name']), PATHINFO_EXTENSION);
+            // move upload file
+            $file = move_uploaded_file($_FILES['a_soal_file']['tmp_name'], FCPATH.$_dir.DIRECTORY_SEPARATOR.$code.'_file'.'.'.$ext);
+
+            if(!$file)
+            {
+                http_response_code(422);
+                $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error')];
+                echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+                return;
+            }
+
+            $_data['question_file'] = $_dir.DIRECTORY_SEPARATOR.$code.'_file'.'.'.$ext;
+        }
+
+        $call = [];
+
+        if(isset($pg))
+        {
+            $_i = 0;
+            foreach($pg as $P)
+            {
+                //if(!isset($P['key'])) continue;
+
+                $call[] = $P;
+
+                if(!empty($P['value']));
+                {
+                    $_data['choice_'.$P['key']] = $P['value'];
+
+                }
+
+                if(!empty($_FILES['pg']['name'][$_i]['file']))
+                {
+                    $_dir = 'assets'.DIRECTORY_SEPARATOR.'files'.DIRECTORY_SEPARATOR.'soal'.DIRECTORY_SEPARATOR.$code;
+                    $ext = pathinfo(basename($_FILES['pg']['name'][$_i]['file']), PATHINFO_EXTENSION);
+                    // move upload file
+                    $file = move_uploaded_file($_FILES['pg']['tmp_name'][$_i]['file'], FCPATH.$_dir.DIRECTORY_SEPARATOR.$code.'_'.$P['key'].'.'.$ext);
+                    $filename = $_dir.DIRECTORY_SEPARATOR.$code.'_'.$P['key'].'.'.$ext;
+                    $_data['choice_'.$P['key'].'_file'] = $filename;
+                }
+
+                $_i++;
+
+            }
+        }
+        
+        $_data['code'] = $code;
+        $_data['subject_id'] = $mapel;
+        $_data['class_id'] = $class;
+        $_data['question'] = $soal;
+        $_data['answer'] = $jawaban;
+        $_data['type'] = $type;
+
+        if(!$this->db->insert('soal', $_data))
+        {
+            http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error')];
+			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+			return;
+        }
+
+        http_response_code(200);
+		$msg = ['err_status' => 'success', 'message' => $this->lang->line('woow_form_success')];
+		echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+		exit;
+        //if(issets())
+    }
+
+    public function edit() {
+        $_id = $this->input->post('a_id');
+        $code = $this->input->post('a_soal_code', TRUE);
+        //$no = $this->input->post('a_soal_no', TRUE);
+        $mapel = $this->input->post('a_soal_subject', TRUE);
+        $class = $this->input->post('a_soal_class', TRUE);
+        $soal = $this->input->post('a_soal_detail', TRUE);
+        $type = $this->input->post('a_soal_type', TRUE);
+        $jawaban = $this->input->post('a_soal_answer', TRUE);
+        $pg = $this->input->post('pg');
+
+        $_data = [];
+
+        header('Content-Type: application/json');
+        
+        // empty validation
+        if(empty($_id) || empty($code) || empty($mapel) || empty($class) || empty($soal) || empty($jawaban) || empty($type))
+        {
+            http_response_code(422);
+            $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required')];
+            echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+            return;
+        }
+
+        
+        
+        if(!empty($_FILES['a_soal_file']['name']))
+        {
+            $_dir = 'assets'.DIRECTORY_SEPARATOR.'files'.DIRECTORY_SEPARATOR.'soal'.DIRECTORY_SEPARATOR.$code;
+            
+            if(!file_exists($_dir))
+                @mkdir(FCPATH.$_dir, 0777, TRUE);
+            
+            // get type
+            $ext = pathinfo(basename($_FILES['a_soal_file']['name']), PATHINFO_EXTENSION);
+
+            if(file_exists(FCPATH.$_dir.DIRECTORY_SEPARATOR.$code.'_file'.'.'.$ext))
+                unlink(FCPATH.$_dir.DIRECTORY_SEPARATOR.$code.'_file'.'.'.$ext);
+            // move upload file
+            $file = move_uploaded_file($_FILES['a_soal_file']['tmp_name'], FCPATH.$_dir.DIRECTORY_SEPARATOR.$code.'_file'.'.'.$ext);
+
+            if(!$file)
+            {
+                http_response_code(422);
+                $msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error')];
+                echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+                return;
+            }
+
+            $_data['question_file'] = $_dir.DIRECTORY_SEPARATOR.$code.'_file'.'.'.$ext;
+        }
+
+        $call = [];
+
+        if(isset($pg))
+        {
+            $_i = 0;
+            foreach($pg as $P)
+            {
+                //if(!isset($P['key'])) continue;
+
+                $call[] = $P;
+
+                if(!empty($P['value']));
+                {
+                    $_data['choice_'.$P['key']] = $P['value'];
+
+                }
+
+                if(!empty($_FILES['pg']['name'][$_i]['file']))
+                {
+                    $_dir = 'assets'.DIRECTORY_SEPARATOR.'files'.DIRECTORY_SEPARATOR.'soal'.DIRECTORY_SEPARATOR.$code;
+                    $ext = pathinfo(basename($_FILES['pg']['name'][$_i]['file']), PATHINFO_EXTENSION);
+                    // move upload file
+                    $filename = $_dir.DIRECTORY_SEPARATOR.$code.'_'.$P['key'].'.'.$ext;
+                    if(file_exists(FCPATH.$filename))
+                        unlink(FCPATH.$filename);
+                    $file = move_uploaded_file($_FILES['pg']['tmp_name'][$_i]['file'], FCPATH.$_dir.DIRECTORY_SEPARATOR.$code.'_'.$P['key'].'.'.$ext);
+                    $_data['choice_'.$P['key'].'_file'] = $filename;
+                }
+
+                $_i++;
+
+            }
+        }
+        
+        $_data['code'] = $code;
+        $_data['subject_id'] = $mapel;
+        $_data['class_id'] = $class;
+        $_data['question'] = $soal;
+        $_data['answer'] = $jawaban;
+        $_data['type'] = $type;
+
+        if(!$this->db->update('soal', $_data, ['soal_id' => $_id]))
+        {
+            http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error')];
+			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+			return;
+        }
+
+        http_response_code(200);
+		$msg = ['err_status' => 'success', 'message' => $this->lang->line('woow_form_success')];
+		echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+		exit;
+        //if(issets())
+    }
+}

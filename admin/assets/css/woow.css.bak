@@ -1,0 +1,132 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+/*.brand-logo img {
+  max-width: 140px;
+  margin-top: 15px
+}*/
+.select-dropdown li img {
+	width:85px !important;
+	height:auto !important;
+}
+ul#sidenav .side-logo {
+	line-height:unset;
+}
+ul#sidenav .side-logo .userView{
+	padding:0px;
+	margin:0px;
+}
+main .container table tbody a.red {
+	background-color:red !important;
+}
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+header, main, footer {
+  padding-left: 300px;
+}
+
+main {
+  padding-top: 20px;
+}
+
+@media only screen and (max-width : 992px) {
+  header, main, footer {
+    padding-left: 0;
+  }
+}
+
+@media only screen and (min-width: 993px) {
+  .container {
+      width: 95%;
+  }
+}
+@media only screen and (min-width : 890px) {
+	ul#sidenav {
+		position:absolute !important;
+		overflow-y:hidden !important;
+		height:auto !important;
+	}
+	aside {
+		width: 300px !important;
+		position: absolute !important;
+	}
+}
+@media only screen and (max-width : 500px) {
+ 	img.woowtix-text {
+    	display: none;
+  }
+  a#logo-container {
+	  position: relative;
+	  float: right;
+	  left: 0;
+  }
+  nav .nav-wrapper {
+	  width:100%;
+  }
+}
+.woowtix-bg {
+	background-color:red !important;
+	
+}
+.woowtix-approve {
+	background-color:green !important;
+	
+}
+a#logo-container {
+	padding-top:5px;
+}
+.snackbar {
+  visibility: visible;
+  width: 100%;
+  background-color: red;
+  color: #ffffff;
+  text-align: left;
+  padding: 2px 10px;
+  z-index: 1;
+  font-size: 14px;
+}
+.sync-block {
+	position:fixed;
+	top:20px;
+	right:20px;
+	z-index:999999;
+	cursor:pointer;
+}
+html {
+	font-size:14px !important;
+}
+.side-nav {
+	height:100% !important;
+}
+.side-nav a {
+	font-size:12px !important;
+}
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  font-size:14px;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.dashboard-row {
+  margin-bottom: 0px;
+}
+
+.dashboard-title {
+  margin-top: 5px;
+  margin-left: 40px;
+}

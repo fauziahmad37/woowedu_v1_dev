@@ -1,0 +1,152 @@
+/*
+WoowTix
+@Andre Lukmana
+andrelukmana@gmail.com
+Hit Corporation
+*/
+
+section#events h1.page-title a {
+	font-family: oswald,sans-serif;
+	color:#000000;
+	font-size: 140%;
+	text-decoration:none;
+}
+i.fa {
+	margin-right:5px;
+}
+section#events .sticky-top ul.cat-list li {
+	text-align:right;
+}
+section#events .sticky-top ul.nav a.nav-link {
+	color:#000000;
+	font-size:90%;
+	font-weight:200;
+}
+section#events .sticky-top ul.nav li a.nav-link:hover, ul.nav-event-category li.nav-item a:hover, section#events ul.nav-event-category li.active a, section#events .sticky-top ul.nav li.active a.nav-link {
+	color:#c82333;
+}
+ul.nav-event-category li.nav-item  {
+	display:inline-block;
+}
+ul.nav-event-category li.nav-item a{
+	color:#000000;
+}
+section#events {
+	padding-top:60px !important;
+}
+div#woowtixSlide {
+	margin-top:68px;
+	margin-bottom:-50px;	
+    position:relative;
+    -webkit-box-shadow:0 1px 4px rgba(0, 0, 0, 0.3);
+    box-shadow:0 1px 4px rgba(0, 0, 0, 0.3);
+}
+div#woowtixSlide img{
+	width:100%;
+	position:relative;
+	background-color:#ffffff;
+}
+
+div#woowtixSlide:after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    -webkit-box-shadow:0 0 40px rgba(0,0,0,0.8);
+    box-shadow:0 0 40px rgba(0,0,0,0.8);
+    bottom:0px;
+    left:10%;
+    right:10%;
+    width:80%;
+    height:50%;
+    -moz-border-radius:100%;
+    border-radius:100%;
+}
+.carousel-control-next,
+.carousel-control-prev {
+    filter: invert(100%);
+}
+
+.sticky-top {
+	top:70px !important;
+}
+#related-events h3.title-article {
+	font-size:110%;
+}
+.card-columns h3.title-article {
+	font-size:140%;
+}
+#related-events p.card-text, div.card-columns div.card-body div.card-text p.text-white, div.card-columns div.card-body div.card-text span{
+	font-size:80%;
+}
+
+.loader {
+    height: 30px;
+    text-align: center;
+    width:150px;
+    margin:0 auto;
+    padding:10px;
+    display: none;
+}
+a#navbar-brand {
+	margin-left:10px;
+}
+
+.navbar-nav a.nav-link {
+	color:#ffffff;
+	font-weight:400;
+	text-transform:uppercase;
+	margin:0 10px;
+	padding:auto 10px;
+}
+#keyword {
+	border:1px solid #ffffff;
+}
+ul.pagination li {
+	margin-right:5px;
+}
+ul.pagination li.circle-btn a,ul.pagination li.btn-active a {
+	width: 30px;
+	height: 30px;
+	padding: 6px 0px;
+	border-radius: 15px;
+	text-align: center;
+	font-size: 12px;
+	line-height: 1.42857;
+	background-color:#fff;
+	display:block;
+	color:#f44336;
+	border:1px solid #f44336;
+}
+ul.pagination li.btn-active a{
+	background-color:#f44336;
+	color:#fff;
+}
+span.event-date {
+	font-size:85%;
+	font-weight:bold;
+}
+#events .card-columns .card a:hover .card-body, #related-events .card a:hover .card-body{
+	background-color:#f44336 !important;
+}
+#events .card-columns .card a, #related-events .card a {
+	text-decoration:none;
+}
+.footer-copyright {
+	background-color:#000000;
+	padding:0px 10px;
+}
+
+.price-ticket {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 5px 10px;
+	background-color:
+	#ff7200 !important;
+	color:
+	#fff;
+	font-weight: bold;
+}
+.list-ticket {
+	
+}

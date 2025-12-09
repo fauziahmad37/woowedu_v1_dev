@@ -1,0 +1,50 @@
+.radio-step {
+    outline: var(--bs-gray-600) 1px solid;
+    border: 3px solid var(--bs-white);
+    border-radius: 50%;
+    height: 18px;
+    width: 18px;
+}
+
+.radio-step:has(input[type="radio"]:checked) {
+    outline: var(--bs-success) 1px solid;
+    background-color: var(--bs-success);
+}
+
+.nav-pills {
+    --bs-nav-pills-border-radius: 40px;
+}
+
+.badge-header {
+    height: 32px;
+    width: 32px;
+}
+
+.list-features {
+    list-style: none;
+}
+
+ul.list-features li::before {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+}
+
+ul.list-features  li.list-item-positive::before {
+    content: "\2714";
+    margin: .375rem .75rem .375rem 0;
+    color: var(--bs-primary);
+    background-color: var(--bs-primary-bg-subtle);
+
+}
+
+ul.list-features  li.list-item-negative::before {
+    content: "\00D7";
+    margin: .25rem .75rem .25rem 0;
+    color: var(--bs-light);
+    background-color: var(--bs-danger);
+
+}

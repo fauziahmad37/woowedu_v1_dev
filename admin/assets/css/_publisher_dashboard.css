@@ -1,0 +1,114 @@
+.card-group-custom {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: rgb(0, 15, 144);
+	background: linear-gradient(90deg, rgba(0, 15, 144, 0.8295693277310925) 0%, rgba(0, 0, 0, 0.927608543417367) 18%, rgba(55, 52, 191, 1) 53%, rgba(38, 35, 227, 0.9640231092436975) 64%, rgba(0, 0, 0, 0.8939950980392157) 94%);
+	padding: 6px;
+	border-radius: 20px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.card-group-custom .card {
+	background: #fff;
+	border-radius: 15px;
+	margin-bottom: 0px;
+
+	margin-top: 5px;
+}
+
+.card-title .image-container {
+	background-color: rgba(38, 35, 227, 0.1);
+	padding: 5px;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+}
+
+.card-title .image-container img {
+	width: 60%;
+	height: 60%;
+	margin-left: 6px;
+	margin-top: 7px;
+	object-fit: contain;
+}
+
+.bar-chart {
+	margin-top: 20px;
+	border-radius: 20px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* custom pagination style */
+/* border rounded with margin every number */
+.pagination li.page-item a.page-link {
+	border-radius: 10px;
+	margin: 5px;
+}
+
+/* modal notification position right */
+.modal-dialog-top {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 20px;
+}
+
+/* modal dialog width */
+.modal-dialog {
+	width: 400px;
+	max-width: 600px;
+}
+
+/* mobile view notification */
+@media (max-width: 768px) {
+	.modal-dialog-top {
+		position: absolute;
+		top: 50px;
+		right: 20px;
+		margin: 0px;
+	}
+}
+
+/* styling notif header */
+.notif-header {
+	margin: 5px;
+}
+
+.notif-header>div {
+	padding-bottom: 5px;
+	border-style: solid;
+	border-bottom: 3px solid #dbd7d7;
+	border-top: 0px;
+	border-left: 0px;
+	border-right: 0px;
+}
+
+.notif-header .active {
+	border-bottom: 3px solid #351E99;
+	color: rgb(0, 15, 144);
+}
+
+.header-item {
+	text-align: center;
+	cursor: pointer;
+	height: fit-content;
+}
+
+.notif-body {
+	height: 300px;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+.notif-body .card {
+	margin: 5px;
+	background-color: #D4D1E9;
+}
+
+#pengingat-stok .card {
+	background-color: #F8D7DA;
+}

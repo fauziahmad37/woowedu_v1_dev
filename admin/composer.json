@@ -1,0 +1,6 @@
+{
+    "require": {
+        "mikehaertl/phpwkhtmltopdf": "^2.5",
+        "rakit/validation": "^1.4"
+    }
+}
