@@ -1,6 +1,7 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
+// $_SERVER["CI_ENV"] = 'production';
 
 class auth extends CI_Controller 
 {
@@ -99,6 +100,24 @@ class auth extends CI_Controller
 				'themes' => $dt->themes
 			)
 		);
+
+		// ==================== GENERATE API TOKEN ================
+		include_once APPPATH . 'libraries/Generate_auth.php';
+		$auth = new Generate_auth();
+		$data = [
+			'id_user' => $dt->userid,
+			'users_token' => $this->session->userdata('user_token')
+		];
+		$resAuth = $auth->generate($data);
+		$resAuth = json_decode($resAuth, true)['data'];
+
+		$jwtToken = $auth->generateToken($resAuth);
+		$jwtToken = json_decode($jwtToken, true)['data'];
+		$this->session->set_userdata('jwt_token', $jwtToken);
+
+		// ==================== END GENERATE API TOKEN ================
+		
+
 		if($dt->user_level==3 || $dt->user_level==6){ //guru or kepsek
 			$getTeacher = $this->db->get_where('teacher', ['nik' =>$username]);
 			$dteacher = $getTeacher->row();

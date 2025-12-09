@@ -4,6 +4,7 @@ class MY_Controller extends CI_Controller
 {
 
 	protected $settings;
+	protected $apiUrl = 'http://103.15.226.136:8087/v1/';
 
 	public function __construct()
 	{
@@ -24,7 +25,7 @@ class MY_Controller extends CI_Controller
 			'user' 	=> $_SESSION['username'] ?? '',
 			'ipadd'	=> $_SERVER['REMOTE_ADDR'],
 			'logdetail' => $this->router->fetch_method() .' : '.$this->router->fetch_class(),
-			// 'url'	=> $_SERVER['HTTP_REFERER'].'/'.$this->router->fetch_method().'/'.$this->uri->segment(3),
+			'url'	=> isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'].'/'.$this->router->fetch_method().'/'.$this->uri->segment(3) : '',
 		];
 
 		// echo(json_encode($_SERVER));die;

@@ -23,15 +23,24 @@ class Welcome extends CI_Controller {
 		$this->load->view('welcome_message');
 	}
 
-	public function insertEbook() {
-		$file = '';
-
-		$csv = fopen($file, 'r');
-
-		while(!feof($csv))
-		{
-			
+	public function testBrowser() {
+		$this->load->view('maintest');
+	}
+	
+	private function get_browsername() {
+		if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== FALSE){
+		$browser = 'Microsoft Internet Explorer';
+		}elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== FALSE) {
+		$browser = 'Google Chrome';
+		}elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== FALSE) {
+		$browser = 'Mozilla Firefox';
+		}elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Opera') !== FALSE) {
+		$browser = 'Opera';
+		}elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Safari') !== FALSE) {
+		$browser = 'Apple Safari';
+		}else {
+		$browser = 'error'; //<-- Browser not found.
 		}
-		fclose($csv);
+		return $browser;
 	}
 }

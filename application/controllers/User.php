@@ -23,6 +23,10 @@ class User extends CI_Controller {
 		$userId = $this->session->userdata('userid');
 		$data['user_data'] = $this->user_model->get_user($userId);
 		$username = $data['user_data']['username'];
+
+		$data['menu'] = isset($_GET['menu']) ? $_GET['menu'] : '';
+		$data['tab'] = isset($_GET['tab']) ? $_GET['tab'] : '';
+
 		
 		// JIKA USER LEVEL ORTU LAKUKAN QUERY UNTUK MENDAPATKAN DATA STUDENT YG TERTAUT
 		if($data['user_data']['user_level'] == 5){
@@ -39,7 +43,6 @@ class User extends CI_Controller {
 			}else{
 				$data['parent'] = [];
 			}
-
 		}
 
 		// JIKA USER LEVEL MURID LAKUKAN QUERY UNTUK MENDAPATKAN DATA PENGAJAR
@@ -55,9 +58,11 @@ class User extends CI_Controller {
 		
 		$data['page_js'] = [
 			['path' => base_url('assets/libs/splide/splide.min.js'), 'defer' => TRUE],
+			['path' => base_url('assets/js/_user.js'), 'defer' => TRUE],
 			['path' => base_url('assets/js/_user_cart.js'), 'defer' => TRUE],
 			['path' => base_url('assets/js/_user_wishlist.js'), 'defer' => TRUE],
-			['path' => "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", 'defer' => TRUE],
+			['path' => 'https://cdn.jsdelivr.net/npm/vue/dist/vue.js'],
+			// ['path' => 'assets/libs/js-multiselect-dropdown-main/multi-select-dropdown.js', 'defer' => TRUE],
 		];
 
 		$data['page_css'] = [
@@ -307,5 +312,24 @@ class User extends CI_Controller {
 			setcookie('themes', $theme, time() + (86400 * 30), "/"); // 86400 = 1 day
 			redirect($_SERVER['HTTP_REFERER']);
 		}
+	}
+
+	public function my_ebook_detail(){
+		$get = $this->input->get();
+		$data['ebook_id'] = $get['id'] ?? 0;
+		$data['my_ebook_id'] = $get['my_ebook_id'] ?? 0;
+
+		$data['page_css'] = [
+			'assets/css/ebook.css',
+			'assets/css/ebookDetail.css',
+			'assets/libs/splide/splide.min.css',
+		];
+
+		$data['page_js'] = [
+			['path' => base_url('assets/js/_my_ebook.js'), 'defer' => TRUE],
+			['path' => 'https://cdn.jsdelivr.net/npm/vue/dist/vue.js']
+		];
+
+		$this->template->load('template', 'user/my_ebook_detail', $data);
 	}
 }

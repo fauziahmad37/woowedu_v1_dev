@@ -392,7 +392,7 @@ class Checkout extends MY_Controller
 		$data['page_css'] = [base_url('assets/css/_bundling_package.css')];
 
 		$get = $this->input->get();
-		$data['trx_number'] = isset($get['transaction_number']) ? $get['transaction_number'] : $get['order_id'];
+		$data['transaction_number'] = isset($get['transaction_number']) ? $get['transaction_number'] : $get['order_id'];
 
 		// $data['data'] = (json_decode($_GET['data']));
 		// if($data['data']->transaction_status == 'settlement'){

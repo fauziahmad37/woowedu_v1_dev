@@ -68,7 +68,20 @@ class Student extends MY_Controller
 		// =========== END SECTION ===========
 
 		// ============ START CART MURID PER KELAS =========
-		$kelas = $this->db->get_where('kelas k', ['k.sekolah_id' => $_SESSION['sekolah_id']])->result_array();
+
+		// Jika user login sebagai guru, tampilkan kelas yang dia ajar
+		if (isset($_SESSION['teacher_id']) && $_SESSION['user_level'] == 3){
+			$this->db->select('c.*');
+			$this->db->where('c.sekolah_id', $_SESSION['sekolah_id']);
+			$this->db->where('ct.teacher_id', $_SESSION['teacher_id']);
+			$this->db->join('kelas c', 'ct.class_id = c.class_id');
+			$kelas = $this->db->get('class_teacher ct')->result_array();
+		} else {
+			// Jika user login sebagai kepsek, tampilkan semua kelas
+			$this->db->where('sekolah_id', $_SESSION['sekolah_id']);
+			$kelas = $this->db->get('kelas')->result_array();
+		}
+
 		foreach ($kelas as $key => $val) {
 			$kelas[$key]['men'] = $this->db->get_where('student', ['class_id' => $val['class_id'], 'gender' => 'laki-laki'])->num_rows();
 			$kelas[$key]['woman'] = $this->db->get_where('student', ['class_id' => $val['class_id'], 'gender' => 'perempuan'])->num_rows();
@@ -93,18 +106,43 @@ class Student extends MY_Controller
 		// ============ END CART MURID PER KELAS =========
 
 		// ========== START TOTAL STUDENT ===========
-		$data['student']['total'] = $this->db->get_where('student', ['sekolah_id' => $_SESSION['sekolah_id']])->num_rows();
-		// gunakan distict query karna username di tabel user terkadang duplicate
-		$data['student']['active'] = $this->db->select('distinct(u.username)')
-			->where('s.sekolah_id', $_SESSION['sekolah_id'])
-			->where('active', 1)
-			->join('users u', 'u.username=s.nis')
-			->get('student s')->num_rows();
-		$data['student']['inactive'] = $this->db->select('distinct(u.username)')
-			->where('s.sekolah_id', $_SESSION['sekolah_id'])
-			->where_in('active', [0, null])
-			->join('users u', 'u.username=s.nis')
-			->get('student s')->num_rows();
+		// jika user sebagai guru
+		if($_SESSION['user_level'] == 3){
+			$data['student']['total'] = $this->db->where('class_id in (select class_id from class_teacher where teacher_id = ' . $_SESSION['teacher_id'] . ')')
+				->get('student')->num_rows();
+
+			// gunakan distict query karna username di tabel user terkadang duplicate
+			$data['student']['active'] = $this->db->select('distinct(u.username)')
+				->where('s.class_id in (select class_id from class_teacher where teacher_id = ' . $_SESSION['teacher_id'] . ')')
+				->where('active', 1)
+				->join('users u', 'u.username=s.nis')
+				->get('student s')->num_rows();
+
+			$data['student']['inactive'] = $this->db->select('distinct(u.username)')
+				->where('s.class_id in (select class_id from class_teacher where teacher_id = ' . $_SESSION['teacher_id'] . ')')
+				->where_in('active', [0, null])
+				->join('users u', 'u.username=s.nis')
+				->get('student s')->num_rows();
+
+		// jika user sebagai kepala sekolah
+		} else {
+			$data['student']['total'] = $this->db->get_where('student', ['sekolah_id' => $_SESSION['sekolah_id']])->num_rows();
+
+			// gunakan distict query karna username di tabel user terkadang duplicate
+			$data['student']['active'] = $this->db->select('distinct(u.username)')
+				->where('s.sekolah_id', $_SESSION['sekolah_id'])
+				->where('active', 1)
+				->join('users u', 'u.username=s.nis')
+				->get('student s')->num_rows();
+
+			$data['student']['inactive'] = $this->db->select('distinct(u.username)')
+				->where('s.sekolah_id', $_SESSION['sekolah_id'])
+				->where_in('active', [0, null])
+				->join('users u', 'u.username=s.nis')
+				->get('student s')->num_rows();
+		}
+
+		
 		// ========== END TOTAL STUDENT ===========
 
 		$this->template->load('template', 'student/index', $data);
@@ -122,9 +160,11 @@ class Student extends MY_Controller
 		$filter['kelas'] = $get['columns'][1]['search']['value'];
 		// $page = ($page - 1) * $limit;
 
+		$students = $this->model_student->get_history($limit, $page, $filter);
+
 		$data['draw']			= $get['draw'];
 		$data['user_level'] 	= $user_level;
-		$data['data'] 			= $this->model_student->get_history($limit, $page, $filter);
+		$data['data'] 			= $students;
 		$data['recordsTotal'] 	= $this->model_student->get_total_history($filter);
 		$data['recordsFiltered'] = $this->model_student->get_total_history($filter);
 

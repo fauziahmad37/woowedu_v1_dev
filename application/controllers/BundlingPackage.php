@@ -17,15 +17,37 @@ class BundlingPackage extends MY_Controller
 
 	public function index()
 	{
+		$data['page_css'] = [
+			'assets/css/ebook.css',
+		];
+
+		$data['page_js'] = [
+			['path' => 'assets/js/_bundling_package_index.js', 'defer' => TRUE],
+		];
+
+		$data['penerbit'] = $this->db->where('deleted_at is null')->get('publishers')->result_array();
+
+		$this->template->load('template', 'bundling_package/index', $data);
 	}
 
 	public function detail($id = '')
 	{
-		$data['page_css'] = [base_url('assets/css/ebookDetail.css')];
+		$data['page_js'] = [
+			['path' => 'assets/js/_paket_bundling.js', 'defer' => TRUE],
+			['path' => 'assets/libs/splide/splide.min.js', 'defer' => TRUE],
+		];
 
-		$data['packages'] = $this->model_bundling_package->get();
-		$data['package'] = $this->model_bundling_package->getById($id);
-		$data['package_items'] = $this->model_bundling_package_book->getByIdBundle($id);
+		// $data['page_css'] = [base_url('assets/css/ebookDetail.css')];
+		$data['page_css'] = [
+			'assets/css/ebookDetail.css',
+			'assets/libs/splide/splide.min.css',
+		];
+
+		$data['id'] = $id;
+
+		// $data['packages'] = $this->model_bundling_package->get();
+		// $data['package'] = $this->model_bundling_package->getById($id);
+		// $data['package_items'] = $this->model_bundling_package_book->getByIdBundle($id);
 
 		// echo(json_encode($data['data']));die;
 		$data['wishlist'] = $this->db->get_where('wishlists', ['user_id' => $_SESSION['userid'], 'item_id'=>$id, 'item_type'=>'bundling'])->row_array();
@@ -36,51 +58,56 @@ class BundlingPackage extends MY_Controller
 
 	public function checkout($id = '')
 	{
+		$data['id'] = $id;
 		$data['page_css'] = [base_url('assets/css/_bundling_package.css')];
 
-		if (isset($_POST['simpan'])) {
-			$dataSave = [
-				'user_id' => $_SESSION['userid'],
-				'tax'	=> (int)$_POST['tax'],
-				'discount' => (int)$_POST['discount'],
-				'total_price' => (float)trim(str_replace(['.', ' ', 'Rp'], '', $_POST['total_price'])),
-				'voucher_id' => 0,
-				'biaya_admin' => (int)$_POST['biaya_admin'],
-				'gross_amount' => (float)trim(str_replace(['.', ' ', 'Rp'], '', $_POST['gross_amount'])),
-			];
+		$data['page_js'] = [
+			['path' => 'assets/js/_checkout_bundling.js', 'defer' => TRUE],
+		];
 
-			$this->db->insert('checkouts', $dataSave);
-			$insert = $this->db->insert_id();
+		// if (isset($_POST['simpan'])) {
+		// 	$dataSave = [
+		// 		'user_id' => $_SESSION['userid'],
+		// 		'tax'	=> (int)$_POST['tax'],
+		// 		'discount' => (int)$_POST['discount'],
+		// 		'total_price' => (float)trim(str_replace(['.', ' ', 'Rp'], '', $_POST['total_price'])),
+		// 		'voucher_id' => 0,
+		// 		'biaya_admin' => (int)$_POST['biaya_admin'],
+		// 		'gross_amount' => (float)trim(str_replace(['.', ' ', 'Rp'], '', $_POST['gross_amount'])),
+		// 	];
 
-			foreach ($_POST['item_ids'] as $val) {
-				$bp = $this->db->get_where('bundling_packages', ['id' => $val])->row_array();
-				$dataItems = [
-					'checkout_id' => $insert,
-					'item_id' => $val,
-					'item_name' => $bp['package_name'],
-					'item_price' => $bp['price'],
-					'item_qty' => 1,
-				];
-				$this->db->insert('checkout_items', $dataItems);
-			}
+		// 	$this->db->insert('checkouts', $dataSave);
+		// 	$insert = $this->db->insert_id();
 
-			if ($insert) {
-				$res = [
-					'success' => true,
-					'message' => 'Data berhasil disimpan',
-					'data' => ['id' => $insert]
-				];
-			} else {
-				$res = [
-					'success' => false,
-					'message' => 'Data gagal disimpan',
-					'data' => ''
-				];
-			}
-			header("Content-Type: application/json");
-			echo json_encode($res, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG);
-			die();
-		}
+		// 	foreach ($_POST['item_ids'] as $val) {
+		// 		$bp = $this->db->get_where('bundling_packages', ['id' => $val])->row_array();
+		// 		$dataItems = [
+		// 			'checkout_id' => $insert,
+		// 			'item_id' => $val,
+		// 			'item_name' => $bp['package_name'],
+		// 			'item_price' => $bp['price'],
+		// 			'item_qty' => 1,
+		// 		];
+		// 		$this->db->insert('checkout_items', $dataItems);
+		// 	}
+
+		// 	if ($insert) {
+		// 		$res = [
+		// 			'success' => true,
+		// 			'message' => 'Data berhasil disimpan',
+		// 			'data' => ['id' => $insert]
+		// 		];
+		// 	} else {
+		// 		$res = [
+		// 			'success' => false,
+		// 			'message' => 'Data gagal disimpan',
+		// 			'data' => ''
+		// 		];
+		// 	}
+		// 	header("Content-Type: application/json");
+		// 	echo json_encode($res, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG);
+		// 	die();
+		// }
 
 		$data['data'] = $this->db->select('bp.*, p.publisher_name')->where('bp.id', $id)
 			->join('publishers p', 'p.id=bp.publisher_id', 'left')
@@ -91,6 +118,11 @@ class BundlingPackage extends MY_Controller
 
 	public function payment($id = '')
 	{
+		$get = $this->input->get();
+		$data['id'] = $id;
+		$data['order_id'] = $get['order_id'] ?? '';
+		$data['snapToken'] = $get['snap_token'] ?? '';
+		$data['callback_url'] = $get['callback_url'] ?? '';
 		// function cek payment status berdasarkan nomor invoice
 		// function cekPaymentStatus($trNumber)
 		// {
@@ -120,7 +152,7 @@ class BundlingPackage extends MY_Controller
 
 		$data['page_css'] = [base_url('assets/css/_bundling_package.css')];
 
-		$post = $this->input->post();
+		// $post = $this->input->post();
 		// require_once 'vendor/midtrans/midtrans-php/Midtrans.php';
 		// Set your Merchant Server Key
 		// \Midtrans\Config::$serverKey = 'SB-Mid-server-Kk4WUNC1k7dZkgpJcX0WMdie';
@@ -272,22 +304,11 @@ class BundlingPackage extends MY_Controller
 
 	public function statusPembayaran()
 	{
+		$get = $this->input->get();
+		$data['transaction_number'] = $get['order_id'] ? $get['order_id'] : $get['transaction_number'];
 		$data['page_css'] = [base_url('assets/css/_bundling_package.css')];
 
-		// $data['data'] = (json_decode($_GET['data']));
-		// if($data['data']->transaction_status == 'settlement'){
-		// 	// cek data order_id / transaction number di tabel transaction_payment
-		// 	$tp = $this->db->where('transaction_number', $data['data']->order_id)->get('transaction_payments')->row_array();
-		// 	if($tp){
-		// 		// jika 
-		// 		if($tp['status'] == 'null' || $tp['status'] == 'pending'){
-		// 			var_dump($tp->row_array());
-		// 			die;
-		// 		}
-		// 	}
-		// }
-
-		// $this->template->load('template', 'bundling_package/payment_status', $data);
-		$this->template->load('template', 'bundling_package/payment_status');
+		
+		$this->template->load('template', 'bundling_package/payment_status', $data);
 	}
 }

@@ -23,7 +23,7 @@ class Asesmen_standard extends CI_Controller
 		if (!isset($_SESSION['username'])) redirect('auth/login');
 
 		$this->settings = json_decode(json_encode($this->model_settings->get_settings()), TRUE);
-		$this->_soaldir = $this->config->item('admin_path').'assets'.DIRECTORY_SEPARATOR.'files'.DIRECTORY_SEPARATOR.'soal';
+		$this->_soaldir = $this->config->item('admin_path') . 'assets' . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . 'soal';
 
 		$this->lang->load('upload', 'indonesia');
 		$this->lang->load('message', 'indonesia');
@@ -34,7 +34,7 @@ class Asesmen_standard extends CI_Controller
 		// PAGE CSS
 		$data['page_css'] = [
 			'https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css',
-			base_url()."assets/css/_create_asesmen_standard.css",
+			base_url() . "assets/css/_create_asesmen_standard.css",
 		];
 
 		// PAGE JS
@@ -100,6 +100,7 @@ class Asesmen_standard extends CI_Controller
 		$data['page_js'][] = ['path' => 'https://kit.fontawesome.com/b377b34fd7.js'];
 		$data['page_js'][] = ['path' => $this->config->item('admin_url') . 'assets/new/libs/randomString.js'];
 		$data['page_js'][] = ['path' => 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'];
+		$data['page_js'][] = ['path' => 'assets/js/asesmen_revamp/_create_multiple_choice.js'];
 		$data['page_js'][] = ['path' => 'assets/js/asesmen_revamp/_create_asesmen_standard.js'];
 
 		$teacher_id = isset($_SESSION['teacher_id']) ? $_SESSION['teacher_id'] : null;
@@ -131,12 +132,23 @@ class Asesmen_standard extends CI_Controller
 
 		// get question detail
 		foreach ($data['questions'] as $key => $question) {
-			$data['questions'][$key]['detail'] = $this->db
-				->join('soal', 'soal.soal_id = soal_exam.soal_id')
+			$detail = $this->db->join('soal', 'soal.soal_id = soal_exam.soal_id')
 				->where('exam_id', $question['exam_id'])
 				->where('soal.type', $question['type'])
 				->get('soal_exam')->result_array();
+
+			//  jika tipe soal pairing atau = 5
+			// if ($question['type'] == 5) {
+			// 	foreach ($detail as $key2 => $value) {
+			// 		$pairing = $this->db->get_where('soal_pairing_question', ['soal_id' => $value['soal']])->result_array();
+			// 		$detail[$key2]['pairing'] = $pairing;
+			// 	}
+			// }
+
+			$data['questions'][$key]['detail'] = $detail;
 		}
+
+		// echo json_encode($data['questions']); die();
 
 		$this->template->load('template', 'asesmen_standard/create', $data);
 	}
@@ -161,7 +173,8 @@ class Asesmen_standard extends CI_Controller
 		echo json_encode($datas, JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
 	}
 
-	function get_student_collect(){
+	function get_student_collect()
+	{
 		$draw = $this->input->post('draw');
 		$limit = $this->input->post('length');
 		$offset = $this->input->post('start');
@@ -177,25 +190,25 @@ class Asesmen_standard extends CI_Controller
 		// looping untuk mendapatkan exam student yang sudah mengumpulkan
 		foreach ($data as $key => $student) {
 			$exam_student = $this->model_exam_student->get_exam_by_student_id($student['student_id'], $_POST['exam_id']);
-			
+
 			$status = '';
 			$examSubmit = '-';
 			$examScore = '-';
 			$exam_student_id = '';
-			
+
 			// jika exam student nya ada maka buat status
-			if($exam_student){
+			if ($exam_student) {
 				$exam_student_id = $exam_student['es_id'];
 				$examSubmit = $exam_student['exam_submit'];
 
 				// jika exam total nilai ada maka sudah dinilai
-				if($exam_student['exam_total_nilai']){
+				if ($exam_student['exam_total_nilai']) {
 					$status = 'Sudah Dinilai';
 					$examScore = $exam_student['exam_total_nilai'];
 				} else {
 					$status = 'Menunggu Penilaian';
 				}
-			}else{
+			} else {
 				$status = 'Belum Mengumpulkan';
 			}
 
@@ -204,13 +217,14 @@ class Asesmen_standard extends CI_Controller
 			$data[$key]['exam_score'] = $examScore;
 			$data[$key]['exam_student_id'] = $exam_student_id;
 			$data[$key]['exam_id'] = $_POST['exam_id'];
+			$data[$key]['notes'] = isset($exam_student['notes']) ? $exam_student['notes'] : '';
 		}
 
 		// jika filter status nya ada
-		if($filters['status']){
+		if ($filters['status']) {
 			// filter data berdasarkan status
 			foreach ($data as $key => $student) {
-				if(strtolower($student['status']) !== strtolower($filters['status'])){
+				if (strtolower($student['status']) !== strtolower($filters['status'])) {
 					unset($data[$key]);
 				}
 			}
@@ -227,10 +241,10 @@ class Asesmen_standard extends CI_Controller
 
 		header('Content-Type: application/json');
 		echo json_encode($datas, JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
-
 	}
 
-	function download_student_collect_exam(){
+	function download_student_collect_exam()
+	{
 		$exam_id = $this->input->get('exam_id');
 
 		$exam = $this->db->where('exam_id', $exam_id)->get('exam')->row_array(); // get detail exam
@@ -241,33 +255,58 @@ class Asesmen_standard extends CI_Controller
 		// looping untuk mendapatkan exam student yang sudah mengumpulkan
 		foreach ($data as $key => $student) {
 			$exam_student = $this->model_exam_student->get_exam_by_student_id($student['student_id'], $exam_id);
-			
+
 			$status = '';
 			$examSubmit = '-';
 			$examScore = '-';
-			
+
 			// jika exam student nya ada maka buat status
-			if($exam_student){
+			if ($exam_student) {
 				$examSubmit = $exam_student['exam_submit'];
 
 				// jika exam total nilai ada maka sudah dinilai
-				if($exam_student['exam_total_nilai']){
+				if ($exam_student['exam_total_nilai']) {
 					$status = 'Sudah Dinilai';
 					$examScore = $exam_student['exam_total_nilai'];
 				} else {
 					$status = 'Menunggu Penilaian';
 				}
-			}else{
+			} else {
 				$status = 'Belum Mengumpulkan';
 			}
+
+
+		// sekolah logo
+
+
+$sekolah_id = $this->session->userdata('sekolah_id');
+$sekolah = $this->db->where('sekolah_id', $sekolah_id)->get('sekolah')->row_array();
+
+// Base64 Logo untuk inline image
+$logo_base64 = '';
+$logo_path = $this->config->item('admin_path') . 'assets/images/logo/' . $sekolah['sekolah_logo'];
+if (file_exists($logo_path)) {
+    $type = pathinfo($logo_path, PATHINFO_EXTENSION);
+    $data_logo = @file_get_contents($logo_path);
+    if ($data_logo !== false) {
+        $logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data_logo);
+    }
+}
+		// end sekolah logo
+
 
 			$data[$key]['status'] = $status;
 			$data[$key]['exam_submit'] = $examSubmit;
 			$data[$key]['exam_score'] = $examScore;
 			$data[$key]['exam_id'] = $exam_id;
+			
 		}
 
-		$html = $this->load->view('asesmen_standard/download_student_collect_exam', ['data' => $data], true);
+		$html = $this->load->view('asesmen_standard/download_student_collect_exam', [
+    'data' => $data,
+    'sekolah' => $sekolah,
+    'logo_base64' => $logo_base64
+], true);
 
 		$dompdf = new Dompdf();
 
@@ -287,6 +326,7 @@ class Asesmen_standard extends CI_Controller
 		$dompdf->stream('soal_' . $exam['code'] . '.pdf', array('Attachment' => 0));
 	}
 
+
 	function create_fill_the_blank()
 	{
 		$data = [];
@@ -298,7 +338,30 @@ class Asesmen_standard extends CI_Controller
 
 	function save_fill_the_blank()
 	{
+		// active CSRF
+		// $this->security->csrf_verify();
+	
 		$post = $this->input->post();
+
+		// check duplicate post in same time in database
+		$checkDuplicate = $this->db->where('question', $post['soal'])
+			->where('type', $post['type'])
+			->where('subject_id', $post['mapel'])
+			->where('created_at >=', date('Y-m-d H:i:s', strtotime('-1 minute')))
+			->get('soal')->row_array();
+		
+		if ($checkDuplicate) {
+			$res = [
+				'success' => false,
+				'message' => 'Soal sudah ada, silahkan gunakan soal lain',
+				'csrf_token' => $this->security->get_csrf_hash()
+			];
+
+			header('Content-Type: application/json');
+			echo json_encode($res);
+			return;
+		}
+
 
 		// generate random string 10 character
 		$code = $this->code();
@@ -361,20 +424,20 @@ class Asesmen_standard extends CI_Controller
 		$data['question'] = trim(preg_replace("/\r|\n/", "", $post['soal']));
 		$data['answer'] = trim(preg_replace("/\r|\n/", "", $post['jawaban']));
 
-		if($post['responseJawabanCheck'] == 'true'){
+		if ($post['responseJawabanCheck'] == 'true') {
 			$data['response_correct_answer'] = trim(preg_replace("/\r|\n/", "", $post['responseJawabanBenar']));
 			$data['response_wrong_answer'] = trim(preg_replace("/\r|\n/", "", $post['responseJawabanSalah']));
 
-			if($post['deleteImageJawabanBenar'] == 'true'){
+			if ($post['deleteImageJawabanBenar'] == 'true') {
 				$data['response_correct_answer_file'] = '';
 			}
 
-			if($post['deleteImageJawabanSalah'] == 'true'){
+			if ($post['deleteImageJawabanSalah'] == 'true') {
 				$data['response_wrong_answer_file'] = '';
 			}
 		}
 
-		if($post['jawabanAlternatifCheck'] == 'true'){
+		if ($post['jawabanAlternatifCheck'] == 'true') {
 			$data['alternative_answer'] = trim(preg_replace("/\r|\n/", "", $post['responseJawabanAlternatif']));
 		}
 
@@ -407,6 +470,25 @@ class Asesmen_standard extends CI_Controller
 	function save_pilihan_ganda()
 	{
 		$post = $this->input->post();
+
+		// check duplicate post in same time in database
+		$checkDuplicate = $this->db->where('question', $post['soal'])
+			->where('type', $post['type'])
+			->where('subject_id', $post['mapel'])
+			->where('created_at >=', date('Y-m-d H:i:s', strtotime('-1 minute')))
+			->get('soal')->row_array();
+		
+		if ($checkDuplicate) {
+			$res = [
+				'success' => false,
+				'message' => 'Soal sudah ada, silahkan gunakan soal lain',
+				'csrf_token' => $this->security->get_csrf_hash()
+			];
+
+			header('Content-Type: application/json');
+			echo json_encode($res);
+			return;
+		}
 
 		// generate random string 10 character
 		$code = $this->code();
@@ -515,7 +597,7 @@ class Asesmen_standard extends CI_Controller
 
 		$data['response_correct_answer'] = trim($post['responseJawabanBenar']);
 		$data['response_wrong_answer'] = trim($post['responseJawabanSalah']);
-	
+
 		$data['point'] = (int)$post['point'];
 
 		$this->db->insert('soal', $data);
@@ -541,8 +623,28 @@ class Asesmen_standard extends CI_Controller
 		echo json_encode($res);
 	}
 
-	function save_true_or_false(){
+	function save_true_or_false()
+	{
 		$post = $this->input->post();
+
+		// check duplicate post in same time in database
+		$checkDuplicate = $this->db->where('question', $post['soal'])
+			->where('type', $post['type'])
+			->where('subject_id', $post['mapel'])
+			->where('created_at >=', date('Y-m-d H:i:s', strtotime('-1 minute')))
+			->get('soal')->row_array();
+
+		if ($checkDuplicate) {
+			$res = [
+				'success' => false,
+				'message' => 'Soal sudah ada, silahkan gunakan soal lain',
+				'csrf_token' => $this->security->get_csrf_hash()
+			];
+
+			header('Content-Type: application/json');
+			echo json_encode($res);
+			return;
+		}
 
 		// generate random string 10 character
 		$code = $this->code();
@@ -631,21 +733,22 @@ class Asesmen_standard extends CI_Controller
 		echo json_encode($res);
 	}
 
-	function update_true_or_false(){
+	function update_true_or_false()
+	{
 		$post = $this->input->post();
-		
+
 		$data = [];
 
 		// get soal
 		$soal = $this->db->where('soal_id', $post['true_or_false_id'])->get('soal')->row_array();
-		$code = $soal['code'];	
+		$code = $soal['code'];
 
 		// save image soal
 		if (isset($_FILES['image'])) {
 			$_dir = $this->config->item('admin_path') . 'assets/files/soal/' . $code;
 			$image = $_FILES['image'];
 			$ext = pathinfo($image['name'], PATHINFO_EXTENSION);
-			$filename = $code . '_soal_'. time() .'.' . $ext;
+			$filename = $code . '_soal_' . time() . '.' . $ext;
 			$destination = $_dir . '/' . $filename;
 
 			if (!file_exists($_dir)) {
@@ -691,7 +794,7 @@ class Asesmen_standard extends CI_Controller
 			$data['response_wrong_answer_file'] = 'assets/files/soal/' . $code . '/' . $filename;
 		}
 
-		if($post['removeImage'] == 'true') $data['question_file'] = '';
+		if ($post['removeImage'] == 'true') $data['question_file'] = '';
 
 		$data['code'] = $code;
 		$data['subject_id'] = $post['mapel'];
@@ -827,7 +930,7 @@ class Asesmen_standard extends CI_Controller
 				list(, $value['image'])      = explode(',', $value['image']);
 				$dataImage = base64_decode($value['image']);
 				$ext = 'jpg';
-				$filename = $code . '_jawaban_' . $key . '_'. time(). '.' . $ext;
+				$filename = $code . '_jawaban_' . $key . '_' . time() . '.' . $ext;
 				$destination = $_dir . '/' . $filename;
 
 				if (!file_exists($_dir)) {
@@ -880,7 +983,8 @@ class Asesmen_standard extends CI_Controller
 		echo json_encode($res);
 	}
 
-	function delete_response_jawaban_pilihan_ganda(){
+	function delete_response_jawaban_pilihan_ganda()
+	{
 		$post = $this->input->post();
 
 		$soal_id = $post['soal_id'];
@@ -979,24 +1083,24 @@ class Asesmen_standard extends CI_Controller
 		$data['answer'] = trim(preg_replace("/\r|\n/", "", $post['jawaban']));
 
 		// jika user menghapus image jawaban benar
-		if($post['deleteImageJawabanBenar'] == 'true'){
+		if ($post['deleteImageJawabanBenar'] == 'true') {
 			$data['response_correct_answer_file'] = '';
 		}
 
 		// jika user menghapus image jawaban salah
-		if($post['deleteImageJawabanSalah'] == 'true'){
+		if ($post['deleteImageJawabanSalah'] == 'true') {
 			$data['response_wrong_answer_file'] = '';
 		}
 
-		if($post['responseJawabanBenar'] == 'Respon Jawaban Benar...'){
+		if ($post['responseJawabanBenar'] == 'Respon Jawaban Benar...') {
 			$data['response_correct_answer'] = '';
-		}else{
+		} else {
 			$data['response_correct_answer'] = trim(preg_replace("/\r|\n/", "", $post['responseJawabanBenar']));
 		}
 
-		if($post['responseJawabanSalah'] == 'Respon Jawaban Salah...'){
+		if ($post['responseJawabanSalah'] == 'Respon Jawaban Salah...') {
 			$data['response_wrong_answer'] = '';
-		}else{
+		} else {
 			$data['response_wrong_answer'] = trim(preg_replace("/\r|\n/", "", $post['responseJawabanSalah']));
 		}
 
@@ -1025,6 +1129,16 @@ class Asesmen_standard extends CI_Controller
 
 		$question = $this->db->where('soal_id', $question_id)->get('soal')->row_array();
 
+		// JIKA JENIS SOAL PAIRING
+		if ($question['type'] == 5) {
+			$question['pairing'] = $this->db->where('soal_id', $question_id)->get('soal_pairing_question')->result_array();
+		}
+
+		// JIKA JENIS SOAL DRAG AND DROP
+		if ($question['type'] == 6) {
+			$question['drag_and_drop'] = $this->db->where('soal_id', $question_id)->get('soal_dragdrop_question')->result_array();
+		}
+
 		$res = [
 			'success' => true,
 			'data' => $question
@@ -1038,32 +1152,215 @@ class Asesmen_standard extends CI_Controller
 	 * **************************************************
 	 * 			START BLOCK PAIRING QUESTION 
 	 * **************************************************
-	 */	
+	 */
 
 	/**
 	 * Page for Pairing Question
 	 *
 	 * @return void
 	 */
-	public function create_pairing_question(): void {
-		try
-		{
+	public function create_pairing_question(): void
+	{
+		try {
 			$question = $this->input->post('question-text', TRUE);
 			$mapel = $this->input->post('mapel', TRUE);
 			$kelas = $this->input->post('kelas', TRUE);
 			$imgAdds = $_FILES['file-add'];
-			$answerKeys = $this->input->post('input-key');
-			$answerValues = $this->input->post('input-value');
+			$answerKeys = array_filter($this->input->post('input-key'), fn($val) => !empty($val));
+			$answerValues = array_filter($this->input->post('input-value'), fn($val) => !empty($val));
 			$imgAsKey = $this->input->post('image-match');
 			$config = $this->input->post('config');
 			$questionImages = $_FILES['q-image'];
 			$rand = bin2hex(random_bytes(5));
 
-			if(empty($question) || empty($mapel) || empty($kelas))
+			if (empty($question) || empty($mapel) || empty($kelas) || count($answerValues) == 0) {
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash(), 'key' => $_POST];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			if(count($_FILES['q-image']['name']) == 0 && count($answerKeys) == 0)
+			{
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash(), 'key' => $answerKeys];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			if(count($_FILES['q-image']['name']) != count($answerValues) && count($answerKeys) != count($answerValues))
 			{
 				http_response_code(422);
 				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash()];
-				echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			// check duplicate post in same time in database
+			$checkDuplicate = $this->db->where('question', $question)
+				->where('type', '5')
+				->where('subject_id', $mapel)
+				->where('created_at >=', date('Y-m-d H:i:s', strtotime('-1 minute')))
+				->get('soal')->row_array();
+
+			if ($checkDuplicate) {
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_duplicate_question'), 'token' => $this->security->get_csrf_hash()];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			$inputQuestion = [
+				'code'			=> $rand,
+				'question' 		=> $question,
+				'type'			=> 5,
+				'subject_id'	=> $mapel,
+				'class_id'		=> $kelas,
+				'point'			=> $config['scores']
+			];
+
+			if (!empty($imgAdds['name'])) {
+				$files = $this->_soaldir . DIRECTORY_SEPARATOR . $rand;
+
+				if (!file_exists($files))
+					@mkdir($files, 0777, TRUE);
+
+				$pathinfo = pathinfo($imgAdds['name']);
+				$filename = md5($imgAdds['name']) . '.' . $pathinfo['extension'];
+
+				if (!move_uploaded_file($imgAdds['tmp_name'], $files . DIRECTORY_SEPARATOR . $filename)) {
+					http_response_code(422);
+					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+					return;
+				}
+
+				$inputQuestion['question_file'] = 'assets/files/soal/' . $rand . '/' . $filename;
+			}
+
+			$this->db->trans_start();
+
+
+			$this->db->insert('soal', $inputQuestion);
+			$id = $this->db->insert_id();
+
+			for ($i = 0; $i < count($answerValues); $i++) {
+				$insert = [
+					'soal_id'		=> $id,
+					'answer_key' 	=> isset($answerKeys[$i]) ? $answerKeys[$i] : '',
+					'answer_value' 	=> $answerValues[$i],
+					'urutan'		=> $i + 1
+				];
+
+				if ($imgAsKey[$i] == 'on') {
+					$insert['has_image'] = 1;
+
+
+
+					if($questionImages['size'][$i] == 0 || empty($questionImages['name'][$i])) {
+						http_response_code(422);
+						$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' =>  $this->security->get_csrf_hash()];
+						echo json_encode($msg);
+						die();
+					}
+
+					$files = $this->_soaldir . DIRECTORY_SEPARATOR . $rand;
+
+					if (!file_exists($files))
+						mkdir($files, 0777, TRUE);
+
+					$pinfo = pathinfo($questionImages['name'][$i]);
+					$filename = $rand . '_' . ($i + 1) . '.' . $pinfo['extension'];
+					$file = $files . DIRECTORY_SEPARATOR . $filename;
+
+					if (!move_uploaded_file($questionImages['tmp_name'][$i], $file)) {
+						http_response_code(422);
+						$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
+						echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+						die();
+					}
+
+					$insert['answer_key'] = 'assets/files/soal/' . $rand . '/' . $filename;
+				}
+
+				$this->db->insert('soal_pairing_question', $insert);
+			}
+
+			$this->db->trans_complete();
+
+			if (!$this->db->trans_status()) {
+				$this->db->trans_rollback();
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error'), 'token' => $this->security->get_csrf_hash()];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT);
+				return;
+			}
+
+			$this->db->trans_commit();
+
+			$output['err_status'] = 'success';
+			$output['message'] = $this->lang->line('woow_form_success');
+			$output['token'] = $this->security->get_csrf_hash();
+			$output['soal_id'] = $id;
+			$output['key'] = $answerKeys;
+
+			echo json_encode($output);
+		} catch (Exception $e) {
+			log_message('error', $e->__toString());
+		}
+	}
+
+	/**
+	 *  Edit pairing question
+	 *
+	 * @return void
+	 */
+	public function edit_pairing_question(): void {
+		try
+		{
+			$itemId = $this->input->post('item-id');
+			$question = $this->input->post('question-text', TRUE);
+			$mapel = $this->input->post('mapel', TRUE);
+			$kelas = $this->input->post('kelas', TRUE);
+			$imgAdds = $_FILES['file-add'];
+			$answerKeys = array_filter($this->input->post('input-key'), fn($val) => !empty($val));
+			$answerValues = array_filter($this->input->post('input-value'), fn($val) => !empty($val));
+			$imgAsKey = $this->input->post('image-match');
+			$config = $this->input->post('config');
+			$questionImages = $_FILES['q-image'];
+			$nameImg = $this->input->post('img-name');
+			$rand = bin2hex(random_bytes(5));
+			
+
+			if (empty($question) || empty($mapel) || empty($kelas) || count($answerValues) == 0) {
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash(), 'key' => $answerKeys];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			
+			if(count($_FILES['q-image']['name']) == 0 && count($answerKeys) == 0)
+			{
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash(), 'key' => $answerKeys];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			if(count($_FILES['q-image']['name']) != count($answerValues) && count($answerKeys) != count($answerValues))
+			{
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash()];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			if(count($answerKeys) != count($answerValues))
+			{
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash()];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 				return;
 			}
 			
@@ -1096,31 +1393,26 @@ class Asesmen_standard extends CI_Controller
 				$inputQuestion['question_file'] = 'assets/files/soal/'.$rand.'/'.$filename;
 			}
 
+			
 			$this->db->trans_start();
 
+			$this->db->update('soal', $inputQuestion, ['soal_id' => $itemId]);
 
-			$this->db->insert('soal', $inputQuestion);
-			$id = $this->db->insert_id();
-
+			$this->db->delete('soal_pairing_question', ['soal_id' => $itemId]);
 			for($i=0;$i<count($answerValues);$i++) {
+
 				$insert = [
-					'soal_id'		=> $id,
-					'answer_key' 	=> $answerKeys[$i],
+					'soal_id'		=> $itemId,
+					'answer_key' 	=> isset($answerKeys[$i]) ? $answerKeys[$i] : '',
 					'answer_value' 	=> $answerValues[$i],
-					'urutan'		=> $i + 1 
+					'urutan'		=> $i + 1
 				];
 
-				if($imgAsKey[$i] == 'on') {
+				if($imgAsKey[$i] == 'on' && !empty($nameImg[$i]) && empty($questionImages['name'][$i])) {
 					$insert['has_image'] = 1;
-
-
-
-					if($questionImages['size'][$i] == 0 || empty($questionImages['name'][$i])) {
-						http_response_code(422);
-						$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' =>  $this->security->get_csrf_hash()];
-						echo json_encode($msg);
-						die();
-					}
+					$insert['answer_key'] = $nameImg[$i];
+				} else if($imgAsKey[$i] == 'on' && !empty($questionImages['name'][$i])) {
+					$insert['has_image'] = 1;
 
 					$files = $this->_soaldir.DIRECTORY_SEPARATOR.$rand;
 
@@ -1142,16 +1434,17 @@ class Asesmen_standard extends CI_Controller
 				}
 
 				$this->db->insert('soal_pairing_question', $insert);
+				
 			}
 
 			$this->db->trans_complete();
 
-			if(!$this->db->trans_status())
-			{
+			
+			if (!$this->db->trans_status()) {
 				$this->db->trans_rollback();
 				http_response_code(422);
 				$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error'), 'token' => $this->security->get_csrf_hash()];
-				echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT);
 				return;
 			}
 
@@ -1160,31 +1453,34 @@ class Asesmen_standard extends CI_Controller
 			$output['err_status'] = 'success';
 			$output['message'] = $this->lang->line('woow_form_success');
 			$output['token'] = $this->security->get_csrf_hash();
-			$output['soal_id'] = $id;
+			$output['soal_id'] = $itemId;
 
 			echo json_encode($output);
+
+
 		}
-		catch(Exception $e)
+		catch(Exception $e) 
 		{
-			log_message('error', $e->__toString());
+			log_message('error', $e->getMessage());
 		}
 	}
+
 
 	/**
 	 * Get Pairing Question By Id
 	 *
 	 * @return void
 	 */
-	public function get_pairing_question_by_id(): void {
+	public function get_pairing_question_by_id(): void
+	{
 		$_id = $this->input->get('question_id');
 		$question = $this->db->get_where('soal', ['soal_id' => $_id])->row_array();
 		$answers = $this->db->get_where('soal_pairing_question', ['soal_id' => $_id])->result_array();
 
-		if(!isset($question))
-		{
+		if (!isset($question)) {
 			http_response_code(422);
 			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error'), 'token' => $this->security->get_csrf_hash()];
-			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+			echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT);
 			return;
 		}
 
@@ -1205,14 +1501,15 @@ class Asesmen_standard extends CI_Controller
 	 * **************************************************
 	 * 		  START BLOCK DRAG AND DROP QUESTION 
 	 * **************************************************
-	 */	
+	 */
 
-	 /**
-	  * Isert new question 
-	  *
-	  * @return void
-	  */
-	public function create_dragdrop_question(): void {
+	/**
+	 * Isert new question 
+	 *
+	 * @return void
+	 */
+	public function create_dragdrop_question(): void
+	{
 
 		$mapel = $this->input->post('mapel');
 		$kelas = $this->input->post('kelas');
@@ -1221,16 +1518,29 @@ class Asesmen_standard extends CI_Controller
 		$addFile = $_FILES['file-add'];
 		$correctAnswers = $this->input->post('answer');
 		$falseAnswers = $this->input->post('falseAnswer');
-		$funfactFiles = $this->input->post('funfactFile');
 		$funfactText = $this->input->post('funfactText');
 		$config = $this->input->post('config');
 
 		header('Content-Type: application/json');
 
-		if(empty($question) || empty($correctAnswers) || empty($config['score']) || empty($kelas) || empty($mapel)) {
+		if (empty($question) || empty($correctAnswers) || empty($config['score']) || empty($kelas) || empty($mapel)) {
 			http_response_code(422);
 			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash()];
-			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+			echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+			return;
+		}
+
+		// check duplicate post in same time in database
+		$checkDuplicate = $this->db->where('question', $question)
+			->where('type', '6')
+			->where('subject_id', $mapel)
+			->where('created_at >=', date('Y-m-d H:i:s', strtotime('-1 minute')))
+			->get('soal')->row_array();
+
+		if ($checkDuplicate) {
+			http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_duplicate_question'), 'token' => $this->security->get_csrf_hash()];
+			echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 			return;
 		}
 
@@ -1242,91 +1552,85 @@ class Asesmen_standard extends CI_Controller
 		$insert['type'] = 6;
 
 		// Additional File
-		if(!empty($addFile['name']))
-		{
-			$_dir = $this->_soaldir.DIRECTORY_SEPARATOR.$code;
+		if (!empty($addFile['name'])) {
+			$_dir = $this->_soaldir . DIRECTORY_SEPARATOR . $code;
 
-			if($addFile['size'] == 0)
-			{
+			if ($addFile['size'] == 0) {
 				http_response_code(422);
 				$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' => $this->security->get_csrf_hash()];
-				echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 				return;
 			}
 
-			if(!file_exists($_dir)) 
+			if (!file_exists($_dir))
 				mkdir($_dir, 0777, TRUE);
 
 			$pathinfo = pathinfo($addFile['name']);
-			$filename = sha1($pathinfo['filename']).'.'.$pathinfo['extension'];
+			$filename = sha1($pathinfo['filename']) . '.' . $pathinfo['extension'];
 
-			if(!move_uploaded_file($addFile['tmp_name'], $_dir.DIRECTORY_SEPARATOR.$filename)) {
+			if (!move_uploaded_file($addFile['tmp_name'], $_dir . DIRECTORY_SEPARATOR . $filename)) {
 				http_response_code(422);
 				$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
-				echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 				return;
 			}
-			
-			$insert['question_file'] = 'assets/files/soal/'.$code.'/'.$filename;
+
+			$insert['question_file'] = 'assets/files/soal/' . $code . '/' . $filename;
 		}
 
-		if($config['funfact'] == 1) {
-			if(!empty($funfactFiles['correct']['name']))
-			{
-				$img = $funfactFiles['correct'];
-				$_dir = $this->_soaldir.DIRECTORY_SEPARATOR.$code;
+		if ($config['funfact'] == 1) {
+			$funfactFiles = $_FILES['funfactFile'];
 
-				if($img['size'] == 0)
-				{
+			if (!empty($funfactFiles['name']['correct'])) {
+				$_dir = $this->_soaldir . DIRECTORY_SEPARATOR . $code;
+
+				if ($funfactFiles['size']['correct'] == 0) {
 					http_response_code(422);
 					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' => $this->security->get_csrf_hash()];
-					echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 					return;
 				}
 
-				if(!file_exists($_dir)) 
+				if (!file_exists($_dir))
 					mkdir($_dir, 0777, TRUE);
 
-				$pathinfo = pathinfo($img['name']);
-				$filename = sha1($pathinfo['filename']).'_response_benar.'.$pathinfo['extension'];
+				$pathinfo = pathinfo($funfactFiles['name']['correct']);
+				$filename = sha1($pathinfo['filename']) . '_response_benar.' . $pathinfo['extension'];
 
-				if(!move_uploaded_file($img['tmp_name'], $_dir.DIRECTORY_SEPARATOR.$filename)) {
+				if (!move_uploaded_file($funfactFiles['tmp_name']['correct'], $_dir . DIRECTORY_SEPARATOR . $filename)) {
 					http_response_code(422);
 					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
-					echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 					return;
 				}
 
-				$insert['response_correct_answer_file'] = 'assets/files/soal/'.$code.'/'.$filename;
+				$insert['response_correct_answer_file'] = 'assets/files/soal/' . $code . '/' . $filename;
 			}
-			
-			if(!empty($funfactFiles['false']['name']))
-			{
-				$img = $funfactFiles['false'];
-				$_dir = $this->_soaldir.DIRECTORY_SEPARATOR.$code;
 
-				if($img['size'] == 0)
-				{
+			if (!empty($funfactFiles['name']['false'])) {
+				$_dir = $this->_soaldir . DIRECTORY_SEPARATOR . $code;
+
+				if ($funfactFiles['size']['false'] == 0) {
 					http_response_code(422);
 					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' => $this->security->get_csrf_hash()];
-					echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 					return;
 				}
 
-				if(!file_exists($_dir)) 
+				if (!file_exists($_dir))
 					mkdir($_dir, 0777, TRUE);
 
-				$pathinfo = pathinfo($img['name']);
-				$filename = sha1($pathinfo['filename']).'_response_salah.'.$pathinfo['extension'];
+				$pathinfo = pathinfo($funfactFiles['name']['false']);
+				$filename = sha1($pathinfo['filename']) . '_response_salah.' . $pathinfo['extension'];
 
-				if(!move_uploaded_file($img['tmp_name'], $_dir.DIRECTORY_SEPARATOR.$filename)) {
+				if (!move_uploaded_file($funfactFiles['tmp_name']['false'], $_dir . DIRECTORY_SEPARATOR . $filename)) {
 					http_response_code(422);
 					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
-					echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG);
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
 					return;
 				}
 
-				$insert['response_wrong_answer_file'] = 'assets/files/soal/'.$code.'/'.$filename;
+				$insert['response_wrong_answer_file'] = 'assets/files/soal/' . $code . '/' . $filename;
 			}
 			$insert['response_correct_answer'] = $funfactText['correct'];
 			$insert['response_wrong_answer'] = $funfactText['false'];
@@ -1338,43 +1642,31 @@ class Asesmen_standard extends CI_Controller
 		$_id = $this->db->insert_id();
 		unset($insert);
 
-		$i=0;
-		foreach($correctAnswers as $ca) {
+		$answers = $config['falseAnswer'] == 1 ? [...$correctAnswers, ...$falseAnswers] : $correctAnswers;
+
+		$i = 0;
+		foreach ($answers as $ca) {
 			$insert['soal_id'] = $_id;
-			$insert['answer_correct'] = $ca['text'];
+			$insert['answer'] = $ca['text'];
 			$insert['words_count'] = $ca['wordsCount'];
+			$insert['is_correct'] = $ca['is_correct'];
 
-			if($config['falseAnswer'] == 1)
-			{
-				if(empty($falseAnswers[$i]['text'])) {
-					http_response_code(422);
-					$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash()];
-					die(json_encode($msg, JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_HEX_TAG));
-					break;
-					return;
-				}
-
-				
-
-				$insert['answer_false'] = $falseAnswers[$i]['text'];
-			}
-
-			$insert['urutan'] = $i + 1;
+			$insert['urutan'] =  $ca['is_correct'] == 0 ? 0 : $i + 1;
 			$this->db->insert('soal_dragdrop_question', $insert);
 			$i++;
 		}
 
 		$this->db->trans_complete();
 
-		if(!$this->db->trans_status()) {
+		if (!$this->db->trans_status()) {
 			http_response_code(422);
 			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error'), 'token' => $this->security->get_csrf_hash()];
-			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
+			echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT);
 			return;
 		}
 
 		$output['err_status'] = 'success';
-		$output['message'] = $this->lang->line('woow_form_success');	
+		$output['message'] = $this->lang->line('woow_form_success');
 		$output['token'] = $this->security->get_csrf_hash();
 		$output['id'] = $_id;
 
@@ -1387,7 +1679,8 @@ class Asesmen_standard extends CI_Controller
 	 * @param [type] $id
 	 * @return void
 	 */
-	public function get_one_dragdrop_question($id): void {
+	public function get_one_dragdrop_question($id): void
+	{
 		$item = $this->db->get_where('soal', ['soal_id' => $id])->row_array();
 		$answers = $this->db->get_where('soal_dragdrop_question', ['soal_id' => $id])->result_array();
 
@@ -1396,11 +1689,167 @@ class Asesmen_standard extends CI_Controller
 		header('Content-Type: application/json');
 		echo json_encode(['data' => $item]);
 	}
+
+	/**
+	 * Edit Drag N Drop 
+	 *
+	 * @return void
+	 */
+	public function edit_dragdrop_question(): void {
+		$id = $this->input->post('id');
+		$mapel = $this->input->post('mapel');
+		$kelas = $this->input->post('kelas');
+		$question = $this->input->post('question', TRUE);
+		$code = bin2hex(random_bytes(4));
+		$addFile = $_FILES['file-add'];
+		$correctAnswers = $this->input->post('answer');
+		$falseAnswers = $this->input->post('falseAnswer');
+		
+		$funfactText = $this->input->post('funfactText');
+		$config = $this->input->post('config');
+
+		header('Content-Type: application/json');
+
+		if (empty($id) || empty($question) || empty($correctAnswers) || empty($config['score']) || empty($kelas) || empty($mapel)) {
+			http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_is_required'), 'token' => $this->security->get_csrf_hash()];
+			echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+			return;
+		}
+
+		$insert['code'] = $code;
+		$insert['question'] = $question;
+		$insert['point'] = $config['score'];
+		$insert['subject_id'] = $mapel;
+		$insert['class_id'] = $kelas;
+		$insert['type'] = 6;
+
+		// Additional File
+		if (!empty($addFile['name'])) {
+			$_dir = $this->_soaldir . DIRECTORY_SEPARATOR . $code;
+
+			if ($addFile['size'] == 0) {
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' => $this->security->get_csrf_hash()];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			if (!file_exists($_dir))
+				mkdir($_dir, 0777, TRUE);
+
+			$pathinfo = pathinfo($addFile['name']);
+			$filename = sha1($pathinfo['filename']) . '.' . $pathinfo['extension'];
+
+			if (!move_uploaded_file($addFile['tmp_name'], $_dir . DIRECTORY_SEPARATOR . $filename)) {
+				http_response_code(422);
+				$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
+				echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+				return;
+			}
+
+			$insert['question_file'] = 'assets/files/soal/' . $code . '/' . $filename;
+		}
+
+		if ($config['funfact'] == 1) {
+			$funfactFiles = $_FILES['funfactFile'];
+
+			if (!empty($funfactFiles['name']['correct'])) {
+				$_dir = $this->_soaldir . DIRECTORY_SEPARATOR . $code;
+
+				if ($funfactFiles['size']['correct'] == 0) {
+					http_response_code(422);
+					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' => $this->security->get_csrf_hash()];
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+					return;
+				}
+
+				if (!file_exists($_dir))
+					mkdir($_dir, 0777, TRUE);
+
+				$pathinfo = pathinfo($funfactFiles['name']['correct']);
+				$filename = sha1($pathinfo['filename']) . '_response_benar.' . $pathinfo['extension'];
+
+				if (!move_uploaded_file($funfactFiles['tmp_name']['correct'], $_dir . DIRECTORY_SEPARATOR . $filename)) {
+					http_response_code(422);
+					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+					return;
+				}
+
+				$insert['response_correct_answer_file'] = 'assets/files/soal/' . $code . '/' . $filename;
+			}
+
+			if (!empty($funfactFiles['name']['false'])) {
+				$_dir = $this->_soaldir . DIRECTORY_SEPARATOR . $code;
+
+				if ($funfactFiles['size']['false'] == 0) {
+					http_response_code(422);
+					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_no_file_selected'), 'token' => $this->security->get_csrf_hash()];
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+					return;
+				}
+
+				if (!file_exists($_dir))
+					mkdir($_dir, 0777, TRUE);
+
+				$pathinfo = pathinfo($funfactFiles['name']['false']);
+				$filename = sha1($pathinfo['filename']) . '_response_salah.' . $pathinfo['extension'];
+
+				if (!move_uploaded_file($funfactFiles['tmp_name']['false'], $_dir . DIRECTORY_SEPARATOR . $filename)) {
+					http_response_code(422);
+					$msg = ['err_status' => 'error', 'message' => $this->lang->line('upload_unable_to_write_file'), 'token' => $this->security->get_csrf_hash()];
+					echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_HEX_TAG);
+					return;
+				}
+
+				$insert['response_wrong_answer_file'] = 'assets/files/soal/' . $code . '/' . $filename;
+			}
+			$insert['response_correct_answer'] = $funfactText['correct'];
+			$insert['response_wrong_answer'] = $funfactText['false'];
+		}
+
+		$this->db->trans_start();
+
+		$this->db->update('soal', $insert, ['soal_id' => $id]);
+		$_id = $id;
+		unset($insert);
+		$answers = $config['falseAnswer'] == 1 ? [...$correctAnswers, ...$falseAnswers] : $correctAnswers;
+
+		$this->db->where('soal_id', $id)->delete('soal_dragdrop_question');
+		$i = 0;
+		foreach ($answers as $ca) {
+			$insert['soal_id'] = $_id;
+			$insert['answer'] = $ca['text'];
+			$insert['words_count'] = $ca['wordsCount'];
+			$insert['is_correct'] = $ca['is_correct'];
+
+			$insert['urutan'] =  $ca['is_correct'] == 0 ? 0 : $i + 1;
+			$this->db->insert('soal_dragdrop_question', $insert);
+			$i++;
+		}
+
+		$this->db->trans_complete();
+
+		if (!$this->db->trans_status()) {
+			http_response_code(422);
+			$msg = ['err_status' => 'error', 'message' => $this->lang->line('woow_form_error'), 'token' => $this->security->get_csrf_hash()];
+			echo json_encode($msg, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT);
+			return;
+		}
+
+		$output['err_status'] = 'success';
+		$output['message'] = $this->lang->line('woow_form_success');
+		$output['token'] = $this->security->get_csrf_hash();
+		$output['id'] = $_id;
+
+		echo json_encode($output, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG);
+	}
 	/**
 	 * **************************************************
 	 * 		 	END BLOCK DRAG AND DROP QUESTION 
 	 * **************************************************
-	 */	
+	 */
 
 	function code($length = 10)
 	{
@@ -1570,12 +2019,45 @@ class Asesmen_standard extends CI_Controller
 			if ($jenis_soal == 5) $group_soal[$key]['jenis_soal'] = 'Menjodohkan';
 			if ($jenis_soal == 6) $group_soal[$key]['jenis_soal'] = 'Seret Lepas';
 
+			// GET DRAG & DROP CHOICES & PAIRING
+			foreach ($soal as $key2 => $val2) {
+				$drag_drop = $this->db->where('soal_id', $val2['soal_id'])->get('soal_dragdrop_question')->result_array();
+				$soal[$key2]['drag_drop'] = $drag_drop;
+
+				$soal_pairing = $this->db->where('soal_id', $val2['soal_id'])->get('soal_pairing_question')->result_array();
+				$soal[$key2]['pairing'] = $soal_pairing;
+			}
+
 			$group_soal[$key]['soal'] = $soal;
 		}
 
-		$data = [		
+
+		// sekolah logo
+
+
+$sekolah_id = $this->session->userdata('sekolah_id');
+
+$sekolah = $this->db->where('sekolah_id', $sekolah_id)->get('sekolah')->row_array();
+
+$logo_base64 = '';
+$logo_path = $this->config->item('admin_path') . 'assets/images/logo/' . $sekolah['sekolah_logo'];
+if (file_exists($logo_path)) {
+	$type = pathinfo($logo_path, PATHINFO_EXTENSION);
+	$data_logo = @file_get_contents($logo_path);
+	if ($data_logo !== false) {
+		$logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data_logo);
+	}
+}
+		// end sekolah logo
+
+		$data = [
 			'exam' => $exam,
 			'group_soal' => $group_soal,
+			'logo_base64' => $logo_base64,
+			'sekolah_nama' => $sekolah['sekolah_nama'],
+			'sekolah_alamat' => $sekolah['sekolah_alamat'],
+			'sekolah_phone' => $sekolah['sekolah_phone'],
+			'sekolah_email' => $sekolah['sekolah_email'],
 		];
 
 		$html = $this->load->view('asesmen_standard/soal_pdf', $data, true);
@@ -1623,12 +2105,45 @@ class Asesmen_standard extends CI_Controller
 			if ($jenis_soal == 5) $group_soal[$key]['jenis_soal'] = 'Menjodohkan';
 			if ($jenis_soal == 6) $group_soal[$key]['jenis_soal'] = 'Seret Lepas';
 
+			// GET DRAG & DROP CHOICES & PAIRING
+			foreach ($soal as $key2 => $val2) {
+				$drag_drop = $this->db->where('soal_id', $val2['soal_id'])->get('soal_dragdrop_question')->result_array();
+				$soal[$key2]['drag_drop'] = $drag_drop;
+
+				$soal_pairing = $this->db->where('soal_id', $val2['soal_id'])->get('soal_pairing_question')->result_array();
+				$soal[$key2]['pairing'] = $soal_pairing;
+			}
+
 			$group_soal[$key]['soal'] = $soal;
 		}
 
-		$data = [		
+
+
+	// sekolah logo
+
+
+$sekolah_id = $this->session->userdata('sekolah_id');
+
+$sekolah = $this->db->where('sekolah_id', $sekolah_id)->get('sekolah')->row_array();
+
+$logo_base64 = '';
+$logo_path = $this->config->item('admin_path') . 'assets/images/logo/' . $sekolah['sekolah_logo'];
+if (file_exists($logo_path)) {
+	$type = pathinfo($logo_path, PATHINFO_EXTENSION);
+	$data_logo = @file_get_contents($logo_path);
+	if ($data_logo !== false) {
+		$logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data_logo);
+	}
+}
+// end sekolah logo 
+		$data = [
 			'exam' => $exam,
 			'group_soal' => $group_soal,
+			'logo_base64' => $logo_base64,
+			'sekolah_nama' => $sekolah['sekolah_nama'],
+			'sekolah_alamat' => $sekolah['sekolah_alamat'],
+			'sekolah_phone' => $sekolah['sekolah_phone'],
+			'sekolah_email' => $sekolah['sekolah_email'],
 		];
 
 		$html = $this->load->view('asesmen_standard/kunci_jawaban_pdf', $data, true);
@@ -1651,77 +2166,125 @@ class Asesmen_standard extends CI_Controller
 		$dompdf->stream('soal_' . $exam['code'] . '.pdf', array('Attachment' => 0));
 	}
 
-	function download_report_student(){
-		$id = $this->input->get('exam_id');
-		$student_id = $this->input->get('student_id');
+function download_report_student()
+{
+	$id = $this->input->get('exam_id');
+	$student_id = $this->input->get('student_id');
 
-		$exam = $this->db->where('exam_id', $id)->get('exam')->row_array();
+	$exam = $this->db->where('exam_id', $id)->get('exam')->row_array();
 
-		$group_soal = $this->db->select('exam_id, grouping')
-			->where('exam_id', $id)
-			->group_by('grouping, exam_id')
+	$group_soal = $this->db->select('exam_id, grouping')
+		->where('exam_id', $id)
+		->group_by('grouping, exam_id')
+		->get('soal_exam')->result_array();
+
+	$total_soal = 0;
+	$totalPointBenar = 0;
+	$totalPointSalah = 0;
+	$jawaban_benar = 0;
+	$jawaban_salah = 0;
+	$hasSoalEssay = false;
+
+	// Kelompokkan soal berdasarkan jenisnya
+	foreach ($group_soal as $key => $val) {
+		$soal = $this->db->where('exam_id', $id)
+			->where('grouping', $val['grouping'])
+			->join('soal', 'soal.soal_id = soal_exam.soal_id')
 			->get('soal_exam')->result_array();
 
-		// kelompokan soal berdasarkan jenis nya
-		foreach ($group_soal as $key => $val) {
-			$soal = $this->db->where('exam_id', $id)
-				->where('grouping', $val['grouping'])
-				->join('soal', 'soal.soal_id = soal_exam.soal_id')
-				->get('soal_exam')->result_array();
+		$jenis_soal = $soal[0]['type'];
+		if ($jenis_soal == 1) $group_soal[$key]['jenis_soal'] = 'Pilihan Ganda';
+		if ($jenis_soal == 2) {
+			$group_soal[$key]['jenis_soal'] = 'Esai';
+			$hasSoalEssay = true;
+		}
+		if ($jenis_soal == 3) $group_soal[$key]['jenis_soal'] = 'Benar atau Salah';
+		if ($jenis_soal == 4) $group_soal[$key]['jenis_soal'] = 'Isi Yang Kosong';
+		if ($jenis_soal == 5) $group_soal[$key]['jenis_soal'] = 'Menjodohkan';
+		if ($jenis_soal == 6) $group_soal[$key]['jenis_soal'] = 'Seret Lepas';
 
-			$jenis_soal = $soal[0]['type'];
-			if ($jenis_soal == 1) $group_soal[$key]['jenis_soal'] = 'Pilihan Ganda';
-			if ($jenis_soal == 2) $group_soal[$key]['jenis_soal'] = 'Esai';
-			if ($jenis_soal == 3) $group_soal[$key]['jenis_soal'] = 'Benar atau Salah';
-			if ($jenis_soal == 4) $group_soal[$key]['jenis_soal'] = 'Isi Yang Kosong';
-			if ($jenis_soal == 5) $group_soal[$key]['jenis_soal'] = 'Menjodohkan';
-			if ($jenis_soal == 6) $group_soal[$key]['jenis_soal'] = 'Seret Lepas';
+		$total_soal += count($soal);
+		$group_soal[$key]['soal'] = $soal;
 
-			$group_soal[$key]['soal'] = $soal;
+		foreach ($soal as $key2 => $val2) {
+			$jawaban = $this->db->where('exam_id', $id)
+				->where('student_id', $student_id)
+				->where('soal_id', $val2['soal_id'])
+				->get('exam_answer')->row_array();
 
-			// ambil jawaban siswa
-			foreach($soal as $key2 => $val2){
-				$jawaban = $this->db->where('exam_id', $id)
-					->where('student_id', $student_id)
-					->where('soal_id', $val2['soal_id'])
-					->get('exam_answer')->row_array();
+			if ($jawaban) {
+				$group_soal[$key]['soal'][$key2]['exam_answer'] = $jawaban['exam_answer'];
+				$group_soal[$key]['soal'][$key2]['correct_answer'] = $jawaban['correct_answer'];
+				$group_soal[$key]['soal'][$key2]['result_answer'] = $jawaban['result_answer'];
 
-				if($jawaban){
-					$group_soal[$key]['soal'][$key2]['exam_answer'] = $jawaban['exam_answer'];
-					$group_soal[$key]['soal'][$key2]['correct_answer'] = $jawaban['correct_answer'];
-					$group_soal[$key]['soal'][$key2]['result_answer'] = $jawaban['result_answer'];
+				if ($jenis_soal == 2) {
+					$totalPointBenar += $jawaban['result_point'];
+				} else {
+					if ($jawaban['result_answer']) {
+						$totalPointBenar += $val2['point'];
+						$jawaban_benar++;
+					} else {
+						$totalPointSalah += $val2['point'];
+						$jawaban_salah++;
+					}
 				}
 			}
 		}
-
-		$data = [		
-			'exam' => $exam,
-			'group_soal' => $group_soal,
-		];
-
-		$html = $this->load->view('asesmen_standard/download_report_student', $data, true);
-		// echo $html;die;
-
-
-		$dompdf = new Dompdf();
-
-		$options = $dompdf->getOptions();
-		$options->set('isRemoteEnabled', true);
-		$dompdf->setOptions($options);
-
-		$dompdf->loadHtml($html);
-
-		// (Optional) Setup the paper size and orientation
-		$dompdf->setPaper('A4', 'portrait');
-
-		// Render the HTML as PDF
-		$dompdf->render();
-
-		// Output the generated PDF to Browser
-		$dompdf->stream('soal_' . $exam['code'] . '.pdf', array('Attachment' => 0));
 	}
 
-	function do_exercise($id = ''){
+	if (!$hasSoalEssay) {
+		$jumlah_total = $totalPointBenar + $totalPointSalah;
+		$totalPointBenar = $jumlah_total > 0 ? ($totalPointBenar / $jumlah_total) * 100 : 0;
+		$totalPointSalah = 100 - $totalPointBenar;
+	}
+
+	// Sekolah data
+	$sekolah_id = $this->session->userdata('sekolah_id');
+	$sekolah = $this->db->where('sekolah_id', $sekolah_id)->get('sekolah')->row_array();
+
+	// logo sekolah
+	$logo_base64 = '';
+	$logo_path = $this->config->item('admin_path') . 'assets/images/logo/' . $sekolah['sekolah_logo'];
+	if (file_exists($logo_path)) {
+		$type = pathinfo($logo_path, PATHINFO_EXTENSION);
+		$data_logo = @file_get_contents($logo_path);
+		if ($data_logo !== false) {
+			$logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data_logo);
+		}
+	}
+
+	$data = [
+		'exam' => $exam,
+		'group_soal' => $group_soal,
+		'total_point' => round($totalPointBenar, 2),
+		'total_soal' => $total_soal,
+		'jawaban_benar' => $jawaban_benar,
+		'jawaban_salah' => $jawaban_salah,
+		'logo_base64' => $logo_base64,
+		'sekolah'	 => [
+			'sekolah_nama' => $sekolah['sekolah_nama'],
+			'sekolah_alamat' => $sekolah['sekolah_alamat'],
+			'sekolah_phone' => $sekolah['sekolah_phone'],
+			'sekolah_email' => $sekolah['sekolah_email'],
+		]
+	];
+
+	$html = $this->load->view('asesmen_standard/download_report_student', $data, true);
+
+	$dompdf = new Dompdf();
+	$options = $dompdf->getOptions();
+	$options->set('isRemoteEnabled', true);
+	$dompdf->setOptions($options);
+	$dompdf->loadHtml($html);
+	$dompdf->setPaper('A4', 'portrait');
+	$dompdf->render();
+	$dompdf->stream('soal_' . $exam['code'] . '.pdf', array('Attachment' => 0));
+}
+
+
+
+ function do_exercise($id = '')
+	{
 		if (empty($id)) redirect('asesmen_standard');
 
 		$data['exam'] = $this->db->where('exam_id', $id)
@@ -1732,7 +2295,8 @@ class Asesmen_standard extends CI_Controller
 		$this->load->view('asesmen_standard/student/do_exercise_new', $data);
 	}
 
-	function get_soal_exam(){
+	function get_soal_exam()
+	{
 		$post = $this->input->post();
 
 		$filter = [];
@@ -1752,7 +2316,8 @@ class Asesmen_standard extends CI_Controller
 		echo json_encode($res);
 	}
 
-	function finish_exam(){
+	function finish_exam()
+	{
 		$post = $this->input->post();
 
 		$exam_id = $post['exam_id'];
@@ -1766,7 +2331,7 @@ class Asesmen_standard extends CI_Controller
 		$time = $hours . ':' . $minutes . ':' . $seconds;
 
 		// jika time nya minus
-		if($seconds < 0){
+		if ($seconds < 0) {
 			$time = '00:00:00';
 		}
 
@@ -1782,7 +2347,7 @@ class Asesmen_standard extends CI_Controller
 			->where('student_id', $post['student_id'])
 			->get('exam_student')->row_array();
 
-		if($cek){
+		if ($cek) {
 			$res = [
 				'success' => true,
 				'message' => 'Asesmen sudah disubmit'
@@ -1806,7 +2371,7 @@ class Asesmen_standard extends CI_Controller
 				'correct_answer' => is_array($question['correct_answer']) ? json_encode($question['correct_answer']) : $question['correct_answer'],
 				'exam_submit' => $data['exam_submit'],
 				'soal_id' => $question['soal_id'],
-				'result_answer' => $question['result_answer'],
+				'result_answer' => isset($question['result_answer']) ? $question['result_answer'] : null,
 			];
 
 			$this->db->insert('exam_answer', $data_soal);
@@ -1822,4 +2387,33 @@ class Asesmen_standard extends CI_Controller
 		echo json_encode($res);
 	}
 
+	// SAVE POINT ESSAY ANSWER
+	function save_point_essay(){
+		$post = $this->input->post();
+
+		$data = [
+			'result_point' => $post['score'],
+			// 'result_notes' => $post['notes'],
+		];
+
+		$this->db->where('ea_id', $post['ea_id'])
+			->update('exam_answer', $data);
+
+		if ($this->db->affected_rows() > 0) {
+			$res = [
+				'success' => true,
+				'message' => $this->lang->line('woow_form_success'),
+				'token' => $this->security->get_csrf_hash()
+			];
+		} else {
+			http_response_code(422);
+			$res = [
+				'success' => false,
+				'message' => $this->lang->line('woow_form_error'),
+				'token' => $this->security->get_csrf_hash()
+			];
+		}	
+
+		echo json_encode($res, JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_TAG);
+	}
 }

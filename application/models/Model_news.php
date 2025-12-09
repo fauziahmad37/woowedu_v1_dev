@@ -23,9 +23,10 @@ class Model_news extends CI_Model {
 		if(!empty($endDate))
 			$this->db->where('date(tanggal) <=', date('Y-m-d', strtotime($endDate)));
 
-		$this->db->where('sekolah_id', $_SESSION['sekolah_id']);
+		$this->db->where('n.sekolah_id', $_SESSION['sekolah_id']);
 		$this->db->select('n.*');
 		$this->db->from('news n');
+		$this->db->join('users u', 'n.user_id = u.userid', 'left');
 		$this->db->order_by('tanggal', 'DESC');
 		$this->db->limit($limit, $page);
 		$query = $this->db->get();

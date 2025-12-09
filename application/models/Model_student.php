@@ -47,6 +47,10 @@ class Model_student extends CI_Model {
 		if(!empty($filter['kelas']))
 			$this->db->where('s.class_id', $filter['kelas']);
 
+		if($_SESSION['user_level'] == 3){
+			$this->db->where('s.class_id IN (SELECT class_id FROM class_teacher WHERE teacher_id = '.$_SESSION['teacher_id'].')');
+		}
+
 		$this->db->where('s.sekolah_id', $_SESSION['sekolah_id']);
 		$this->db->select('s.*, k.class_name, u.active');
 		$this->db->from('student s');
@@ -64,6 +68,10 @@ class Model_student extends CI_Model {
 
 		if(!empty($filter['kelas']))
 			$this->db->where('s.class_id', $filter['kelas']);
+
+		if($_SESSION['user_level'] == 3){
+			$this->db->where('s.class_id IN (SELECT class_id FROM class_teacher WHERE teacher_id = '.$_SESSION['teacher_id'].')');
+		}
 
 		$this->db->where('s.sekolah_id', $_SESSION['sekolah_id']);
 		$this->db->join('kelas k', 'k.class_id = s.class_id', 'left');

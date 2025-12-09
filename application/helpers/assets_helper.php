@@ -6,8 +6,8 @@ function add_css($stylesheet) {
 	if(!is_array($stylesheet)) return;
 	foreach($stylesheet as $css) {
 		$output .= '<link rel="stylesheet" type="text/css" href="'.html_escape($css).'">'.PHP_EOL;
+		unset($css);
 	}
-	unset($stylesheet);
 	return $output;
 }
 

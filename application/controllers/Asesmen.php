@@ -84,11 +84,13 @@ class Asesmen extends CI_Controller {
 						->order_by('grouping', 'ASC')
 						->get('soal_exam se')->result_array();
 		
-		// GET DRAG & DROP CHOICES
+		// GET DRAG & DROP CHOICES & PAIRING
 		foreach($data['soal_exam'] as $key => $value){
 			$drag_drop = $this->db->where('soal_id', $value['soal_id'])->get('soal_dragdrop_question')->result_array();
 			$data['soal_exam'][$key]['drag_drop'] = $drag_drop;
 
+			$soal_pairing = $this->db->where('soal_id', $value['soal_id'])->get('soal_pairing_question')->result_array();
+			$data['soal_exam'][$key]['pairing'] = $soal_pairing;
 		}
 
 		// DATA CARD DASHBOARD SISWA MENGUMPULKAN
@@ -294,6 +296,13 @@ class Asesmen extends CI_Controller {
         $limit = $this->input->get('length');
         $offset = $this->input->get('start');
         $filters = $this->input->get('columns');
+		
+		if(isset($_SESSION['teacher_id'])){
+			$teacherSubject = $this->db->get_where('subject_teacher', ['teacher_id' => $_SESSION['teacher_id']])->result_array();
+			$teacherSubject = array_column($teacherSubject, 'class_id');
+		}
+
+		$filters[7]['search']['value'] = isset($teacherSubject) ? $teacherSubject : null;
 
         $data = $this->model_asesmen->getAllAsesmenKhusus($limit, $offset, $filters);
 		
@@ -666,6 +675,16 @@ class Asesmen extends CI_Controller {
 			}
 
 			$this->db->trans_commit();
+			
+			// import push notif
+			include_once APPPATH . 'libraries/Push_notif.php';
+			$pushNotif = new Push_notif();
+			
+			$data_notif = [
+				'exam_id' => $exam_id,
+				'title' => 'Ada ujian yang akan Kamu kerjakan'
+			];
+			$new_exam = $pushNotif->new_exam($data_notif);
 			http_response_code(200);
 			$msg = ['err_status' => 'success', 'message' => $this->lang->line('woow_form_success'), 'id' => $exam_id, 'token' => $this->security->get_csrf_hash()];
 			echo json_encode($msg, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT);
@@ -962,20 +981,47 @@ class Asesmen extends CI_Controller {
 						->order_by('grouping', 'ASC')
 						->get('soal_exam se')->result_array();
 
+		$hasSoalEssay = false;
+
 		// looping soal_exam dan ambil jawaban siswa kemudian masukan kedalam array soal_exam
 		foreach ($data['soal_exam'] as $key => $value) {
 			$exam_answer = $this->db->where('exam_id', $exam_id)
 							->where('student_id', $student_id)
 							->where('soal_id', $value['soal_id'])
 							->get('exam_answer')->result_array();
+
+			// jika jenis soal adalah drag and drop
+			if($value['type'] == 6){
+
+				// looping jawaban siswa
+				$jawaban_siswa = [];
+				foreach(json_decode($exam_answer[0]['exam_answer']) as $key2 => $value2){
+					$urutan = $value2->urutan;
+
+					$jawaban_siswa[] = $this->db->where('urutan', $urutan)
+						->where('soal_id', $value['soal_id'])
+						->get('soal_dragdrop_question')->row_array();
+				}
+
+				$data['soal_exam'][$key]['drag_drop_answer'] = $jawaban_siswa;
+
+			}
+
+			
 			$data['soal_exam'][$key]['exam_answer'] = $exam_answer;
+			
+			// cek apakah ada soal essay
+			if($value['type'] == 2){
+				$hasSoalEssay = true;
+			}
 		}
-		
 
 		// hitung total soal
 		$total_soal = count($data['soal_exam']);
 		$jawaban_benar = 0;
 		$jawaban_salah = 0;
+		$totalPointBenar = 0;
+		$totalPointSalah = 0;
 
 		foreach ($data['soal_exam'] as $key => $value) {
 			$totalAnswer = count($value['exam_answer']); // total jawaban yang di jawab oleh siswa
@@ -983,25 +1029,47 @@ class Asesmen extends CI_Controller {
 			$salah = 0; // jawaban salah
 
 			foreach($value['exam_answer'] as $key2 => $value2){
-				if ($value2['result_answer']) {
+				if ($value2['result_answer']) {					
 					$benar++;
 				} else {
 					$salah++;
 				}
+
+				// jika jenis soal essay maka bobot nilainya di ambil dari soal_exam
+				if($value['type'] == 2){
+					$totalPointBenar += $value2['result_point'];
+				} else {
+					// jika jenis soal selain essay, maka bobot nilainya di ambil dari soal_exam
+					// jika jawaban nya benar
+					if($value2['result_answer']){
+						$totalPointBenar += $value['point'];
+					} else {
+						$totalPointSalah += $value['point'];
+					}
+				}
 			}
 
 
-			// jika total jawaban yang di jawab sama dengan jawaban benar
-			if($totalAnswer == $benar){
-				$data['soal_exam'][$key]['status'] = 'benar';
-				$jawaban_benar++;
-			}else{
-				$data['soal_exam'][$key]['status'] = 'salah';
-				$jawaban_salah++;
+			// jika total jawaban yang di jawab sama dengan jawaban benar untuk soal selain essay
+			if($value['type'] != 2){
+				if($totalAnswer == $benar){
+					$data['soal_exam'][$key]['status'] = 'benar';
+					$jawaban_benar++;
+				}else{
+					$data['soal_exam'][$key]['status'] = 'salah';
+					$jawaban_salah++;
+				}
 			}
 			
 		}
 
+		// jika tidak ada soal essay, maka total point benar di hitung dari persentase jawaban benar
+		if(!$hasSoalEssay){
+			$totalPointBenar = ($totalPointBenar / ($totalPointBenar + $totalPointSalah)) * 100;
+			$totalPointSalah = 100 - $totalPointBenar;
+		}
+
+		$data['total_point'] = $totalPointBenar;
 		$data['total_soal'] = $total_soal;
 		$data['jawaban_benar'] = $jawaban_benar;
 		$data['jawaban_salah'] = $jawaban_salah;
@@ -1016,10 +1084,14 @@ class Asesmen extends CI_Controller {
 			->get('student s')->row_array();
 
 		// count percentage of correct answer
-		$correctPercentage = ($jawaban_benar / $total_soal) * 100;
+		// $correctPercentage = ($jawaban_benar / $total_soal) * 100;
+		// percentage correct answer sekarang di hitung berdasarkan total point
+		$correctPercentage = $totalPointBenar;
+
 		$data['correctPercentage'] = round($correctPercentage, 2);
 
-		$wrongPercentage = ($jawaban_salah / $total_soal) * 100;
+		// $wrongPercentage = ($jawaban_salah / $total_soal) * 100;
+		$wrongPercentage = 100 - $data['correctPercentage'];
 		$data['wrongPercentage'] = $wrongPercentage;
 
 		$user = $this->db->where('username', $student['nis'])->get('users')->row_array();
@@ -1085,9 +1157,16 @@ class Asesmen extends CI_Controller {
 		$post = $this->input->post();
 		$exam_student_id 	= $post['exam_student_id'];
 		$score 				= $post['score'];
+		$notes 				= $post['notes'];
 
-		$update = $this->db->update('exam_student', ['exam_total_nilai' => $score], ['es_id' => $exam_student_id]);
+		$update = $this->db->update('exam_student', ['exam_total_nilai' => $score, 'notes' => $notes], ['es_id' => $exam_student_id]);
 		if($update){
+			// import push notif
+			include_once APPPATH . 'libraries/Push_notif.php';
+			$pushNotif = new Push_notif();
+
+			$pushNotif->send_exam_score($exam_student_id);
+
 			$datas = [
 				'success' => true,
 				'message' => 'Data berhasil di simpan!'
@@ -1100,6 +1179,7 @@ class Asesmen extends CI_Controller {
 		}
 		echo json_encode($datas, JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
 	}
+
 
 	/**
 	 * Delete, Post exam_id
@@ -1576,6 +1656,20 @@ class Asesmen extends CI_Controller {
 
 		}
 		ob_end_flush();
+	}
+
+	function clear(){
+		echo '
+			<script>
+				window.localStorage.removeItem("examId");
+				window.localStorage.removeItem("remaining_time");
+				window.localStorage.removeItem("soal");
+				window.localStorage.removeItem("soal_master");
+				window.localStorage.removeItem("start_time");
+
+				window.location.href = "'.base_url('Asesmen').'";
+			</script>
+		';
 	}
 	
 }

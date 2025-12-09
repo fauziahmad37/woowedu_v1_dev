@@ -105,7 +105,6 @@ class Sesi extends MY_Controller {
 		echo $html;
 	}
 		
- 
 	public function loaddata()
 	{
 		function classLevel($data){
@@ -325,3 +324,5 @@ class Sesi extends MY_Controller {
 		echo json_encode($success);
 	}
 }
+
+

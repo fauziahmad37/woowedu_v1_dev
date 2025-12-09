@@ -190,6 +190,19 @@ class Task extends MY_Controller {
 			$data['task_student'] = $this->db->where('student_id', $student['student_id'])->where('task_id', $id)->order_by('ts_id', 'desc')->get('task_student')->row_array();
 		}
 
+		if($user_level == 5 && !$ts_id){ // jika user login sebagai orang tua murid dan ts_id nya kosong	
+			$parent = $this->db->where('username', $this->session->userdata('username'))->get('parent')->row_array();
+			$student = $this->db->where('parent_id', $parent['parent_id'])->get('student')->result_array();
+
+			$student_ids = [];
+			foreach ($student as $key => $value) {
+				$student_ids[] = $value['student_id'];
+			}
+
+			$task_student = $this->db->where_in('student_id', $student_ids)->where('task_id', $id)->order_by('ts_id', 'desc')->get('task_student')->row_array();
+			$data['task_student'] = $task_student;
+		}
+
 		if($user_level == 3 && $ts_id){ // jika user login sebagai guru dan ts_id ada	
 			$student = $this->db->where('nis', $this->session->userdata('username'))->get('student')->row_array();
 			$data['task_student'] = $this->db->where('ts_id', $ts_id)->get('task_student')->row_array();
@@ -207,7 +220,7 @@ class Task extends MY_Controller {
 			
 			$this->template->load('template', 'task/detail_tugas_guru', $data);
 		} else {
-			
+
 			$this->template->load('template', 'task/detail', $data);	
 		}
 		
@@ -297,7 +310,7 @@ class Task extends MY_Controller {
 
 		$config['upload_path'] = $dir;
 		$config['allowed_types']        = 'gif|jpg|jpeg|png|pdf|docx|doc|xls|xlsx|ppt|pptx|mp4';
-		$config['max_size']             = 5097152;
+		$config['max_size']             = 100000; // 100 MB
 		$config['encrypt_name']         = true;
 
 		$this->load->library('upload', $config);

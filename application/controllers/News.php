@@ -51,8 +51,8 @@ class News extends CI_Controller {
 			}
 
 			$config['upload_path'] = $dir;
-			$config['allowed_types']        = 'gif|jpg|jpeg|png|webp';
-			$config['max_size']             = 3000;
+			$config['allowed_types']        = 'jpg|jpeg|png|webp';
+			$config['max_size']             = 2000;
 			$config['encrypt_name']         = true;
 
 			$this->load->library('upload', $config);
@@ -61,8 +61,9 @@ class News extends CI_Controller {
 				// upload fails
 				$resp = [
 					'error' => true,
-					'message' => json_encode($this->upload->display_errors()) 
+					'message' => $this->upload->display_errors()
 				];
+
 				$resp['token'] = $this->security->get_csrf_hash();
 				$this->session->set_flashdata('error', $resp);
 				redirect($_SERVER['HTTP_REFERER']);
@@ -75,6 +76,7 @@ class News extends CI_Controller {
 		if( isset($post['id'])){
 			
 			$data_save = [
+				'user_id' 	=> $post['user_id'],
 				'judul'		=> strip_tags($post['title'], true), 
 				'isi'		=> strip_tags($post['isi']),
 				'tanggal'	=> date('Y-m-d H:i:00', time()),
@@ -102,6 +104,7 @@ class News extends CI_Controller {
 					
 					// insert ke notif
 					$data_notif = [
+						'user_id' 	=> $post['user_id'],
 						'type' 		=> 'NEWS',
 						'title' 	=> $data_save['judul'],
 						'seen' 		=> false,

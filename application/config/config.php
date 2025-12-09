@@ -390,7 +390,7 @@ $config['encryption_key'] = '';
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'ci_session';
 $config['sess_samesite'] = 'Lax';
-$config['sess_expiration'] = 7200;
+$config['sess_expiration'] = 900;
 $config['sess_save_path'] = APPPATH.'sessions';
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 72000;
@@ -470,11 +470,12 @@ $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array("materi/delete", "asesmen/save", "asesmen/save_answer", 
 	"asesmen/delete", "asesmen/generate_pertanyaan_mandiri", "ebook/save_book", "ebook/bookmark", "asesmen/save_score", 
 	"student/get_summary", "materi/set_relasi", "teacher/download", "asesmen/import_soal_pg", "asesmen_standard/get_question_bank",
-	"asesmen_standard/save_fill_the_blank", "asesmen_standard/get_question_fill_the_blank", "asesmen_standard/update_fill_the_blank",
+	"asesmen_standard/get_question_fill_the_blank", "asesmen_standard/update_fill_the_blank",
 	"asesmen_standard/save_draft", "asesmen_standard/update_pilihan_ganda",
 	"asesmen_standard/delete_response_jawaban_pilihan_ganda", "asesmen_standard/get_student_collect",
 	"asesmen_standard/get_soal_exam", "soal/get_detail_soal", "asesmen_standard/finish_exam",
-	"soal/get_soal_exam", "asesmen_standard/create_dragdrop_question"
+	"soal/get_soal_exam", "asesmen_standard/create_dragdrop_question", "asesmen_standard/save_point_essay",
+	"asesmen_standard/create_pairing_question", "api/Api_ebook/checkout", "api/Api_ebook/makePayment"
 	);
 
 /*
@@ -549,5 +550,5 @@ $config['proxy_ips'] = '';
  *  ADDITIONAL CONFIG
  * 
  */
-$config['admin_path'] = FCPATH.'admin/';
+$config['admin_path'] = str_replace('/web', '', FCPATH).'admin/';
 $config['admin_url'] = str_replace('/web', '', $config['base_url']).'admin/'; 
