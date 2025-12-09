@@ -60,6 +60,7 @@ $('.save-score').on('click', e => {
 		data: {
 			exam_student_id: $('input[name="exam_student_id"]').val(),
 			score: $('input[name="score"]').val(),
+			notes: $('textarea[name="notes"]').val(),
 		},
 		dataType: "JSON",
 		success: function (response) {
@@ -82,6 +83,7 @@ $('.save-score').on('click', e => {
  * This chart is a donut chart that displays the percentage of correct and incorrect answers.
  */
 
+const donnutChart = () => {
 Highcharts.chart('donut-chart', {
 	chart: {
 		type: 'pie',
@@ -179,4 +181,7 @@ Highcharts.chart('donut-chart', {
 		}]
 	}]
 });
+};
+
+donnutChart();
 

@@ -95,9 +95,9 @@ const table = $('#tbl-materi').DataTable({
 			render(data, row, type, meta){
 				let icon;
 				if(type.type == 'file'){
-					icon = `<a href="./assets/files/materi/${type.materi_file}" class="btn btn-clear text-primary" target="_blank">
+					icon = `<button class="btn btn-clear text-primary" onclick="checkFileExists('${BASE_URL+'assets/files/materi/'+type.materi_file}')">
 								<img src="./assets/themes/space/icons/file-text-fill.svg">
-							</a>`;
+							</button>`;
 				}else if(type.type == 'link'){
 					icon = `<a href="${type.materi_file}" class="btn btn-clear text-primary" target="_blank">
 								<img src="./assets/themes/space/icons/link-45deg.svg">

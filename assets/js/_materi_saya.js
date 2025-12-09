@@ -53,9 +53,12 @@ $(document).ready(function () {
 				data: 'materi_file',
 				class: 'text-center',
 				render(data, row, type, meta) {
-					return `${(type.type == 'file') ? `<a href="${BASE_URL+'assets/files/materi/'+data}" target="_blank">
-						<img src="${BASE_URL+'assets/themes/space/icons/file-text-fill.svg'}" width="25">
-					</a>` : `<a href="${data}" target="_blank"><img src="${BASE_URL+'assets/themes/space/icons/link-45deg.svg'}" width="25"></a>` }`;
+					return `${(type.type == 'file') ? `
+						<button class="btn btn-clear text-primary" onclick="checkFileExists('${BASE_URL+'assets/files/materi/'+data}')">
+							<img src="./assets/themes/space/icons/file-text-fill.svg">
+						</button>`
+						: 
+						`<a href="${data}" target="_blank"><img src="${BASE_URL+'assets/themes/space/icons/link-45deg.svg'}" width="25"></a>` }`;
 				}	
 			},
 			{

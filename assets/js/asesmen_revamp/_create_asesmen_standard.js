@@ -5,6 +5,7 @@ let listSoal = []; // ini akan terisi dengan list soal yang ada di masing-masing
 let typeOfQuestions = []; // ini akan terisi dengan jenis soal yang dipilih
 let questionNumberActive = 0; // ini akan terisi dengan nomor soal yang sedang aktif
 
+
 const mdlPairingEl = document.querySelector('#mdl-add-pairing');
 const mdlPairing = new bootstrap.Modal(mdlPairingEl);
 const mdlAddDragdropEl = document.getElementById('mdl-add-dragdrop');
@@ -32,32 +33,32 @@ $('#create-soal').on('click', () => {
 
 	// ====================== validasi ======================
 	if ($('#select-mapel').val() == '') {
-		alert('Harap pilih mata pelajaran terlebih dahulu!');
+		alertValidation('Isian mandatori (*) tidak boleh kosong!');
 		return;
 	}
 
 	if ($('#select-kelas').val() == '') {
-		alert('Harap pilih kelas terlebih dahulu!');
+		alertValidation('Isian mandatori (*) tidak boleh kosong!');
 		return;
 	}
 
 	if ($('#select-category').val() == '') {
-		alert('Harap pilih kategori terlebih dahulu!');
+		alertValidation('Isian mandatori (*) tidak boleh kosong!');
 		return;
 	}
 
 	if ($('input[name="a_start"]').val() == '') {
-		alert('Harap pilih tanggal mulai terlebih dahulu!');
+		alertValidation('Isian mandatori (*) tidak boleh kosong!');
 		return;
 	}
 
 	if ($('input[name="a_end"]').val() == '') {
-		alert('Harap pilih tanggal selesai terlebih dahulu!');
+		alertValidation('Isian mandatori (*) tidak boleh kosong!');
 		return;
 	}
 
 	if ($('input[name="a_duration"]').val() == '') {
-		alert('Harap masukan durasi terlebih dahulu!');
+		alertValidation('Isian mandatori (*) tidak boleh kosong!');
 		return;
 	}
 
@@ -82,18 +83,18 @@ $('#create-soal').on('click', () => {
 
 	// validasi jenis soal
 	if (jenisSoal.includes(jenis_soal)) {
-		alert('Jenis soal sudah ada');
+		alertValidation('Jenis soal sudah ada');
 		return;
 	}
 
 	// validasi
 	if (jenis_soal == '') {
-		alert('Pilih jenis soal terlebih dahulu');
+		alertValidation('Pilih jenis soal terlebih dahulu');
 		return;
 	}
 
 	if ($('#a_jumlah_petanyaan').val() == '') {
-		alert('Masukan jumlah soal terlebih dahulu');
+		alertValidation('Masukan jumlah soal terlebih dahulu');
 		return;
 	}
 
@@ -202,6 +203,12 @@ function createBankSoal() {
 		// new tab window
 		showFillTheBlank();
 
+		if(jenisSoal == 2){ // jika jenis soal adalah uraian
+			$('.soal-title').text('Uraian'); // ganti judul soal header
+		} else {
+			$('.soal-title').text('Isi yang Kosong');
+		}
+
 		// reset input and image fill the blank
 		$('#fiil_the_blank_id').val('');
 		$('#image').val('');
@@ -275,12 +282,20 @@ function tinjauSoal(e) {
 		},
 		success: function (res) {
 			if (res.success) {
+				$('.multiple-choice-answer').addClass('d-none'); // hide multiple choice answer
+				$('.essay-answer').addClass('d-none'); // hide essay answer
+				$('.ftb-answer').addClass('d-none'); // hide fill the blank answer
+				$('.tof-answer').addClass('d-none'); // hide true or false answer
+				$('.pairing-answer').addClass('d-none'); // hide pairing answer
+				$('.drag-drop-answer').addClass('d-none'); // hide drag and drop answer
+
 				let soal = res.data;
 
 				// section soal
 				// jika soal hanya text
 				if (soal.question && !soal.question_file) {
 					$('#question').html(soal.question);
+					$('#question').parent().addClass('w-100');
 					$('.image-soal-container').addClass('d-none');
 					$('.image-soal-container button').addClass('d-none');
 				}
@@ -296,6 +311,7 @@ function tinjauSoal(e) {
 				// jika soal text dan gambar
 				if (soal.question && soal.question_file) {
 					$('#question').html(soal.question);
+					$('#question').parent().removeClass('w-100');
 					$('.image-soal-container').removeClass('d-none');
 					$('.image-soal-container button').removeClass('d-none');
 					$('.image-soal-container img').attr('src', ADMIN_URL + soal.question_file);
@@ -430,11 +446,11 @@ function tinjauSoal(e) {
 					$('.tof-answer').removeClass('d-none');
 
 					// set jawaban benar atau salah
-					if(soal.answer == 'true') {
+					if (soal.answer == 'true') {
 						$('.tof-answer .form-check-input')[0].checked = true;
 					} else {
 						$('.tof-answer .form-check-input')[1].checked = true;
-					} 
+					}
 
 					// FOOTER SECTION
 					$('.soal-footer .question-type').html(`<h5 class="m-0">
@@ -442,7 +458,7 @@ function tinjauSoal(e) {
 							Benar atau Salah
 					</h5>`);
 				}
-				
+
 				// jika soal fill the blank
 				if (soal.type == '4') {
 					// show ftb answer
@@ -465,6 +481,62 @@ function tinjauSoal(e) {
 					</h5>`);
 				}
 
+				// jika soal menjodohkan
+				if (soal.type == '5') {
+					$('.drag-drop-answer').addClass('d-none'); // hide drag and drop answer
+
+					// show pairing answer
+					$('.pairing-answer').removeClass('d-none');
+					// section soal
+					$('.pairing-answer .list-pairing').html('');
+
+					// examp title
+					$('.question-type h5').html(`<i class="bi bi-stack text-white fs-4"></i> Menjodohkan`);
+
+					// loop text answer
+					soal.pairing.forEach((item, index) => {
+						$('.pairing-answer .list-pairing').append(`
+							<div class="col-3 box-answer" id="indukSemang-0">
+								<div class="box-answer-head mb-3 bg-primary-700 rounded" style="height: 160px;">
+									<div class="d-flex draggable-box justify-content-center align-items-center overflow-hidden bg-white text-dark rounded p-2 w-100 position-relative" draggable="true" ondragstart="pairingDragStart(event)" ondrag="pairingDragMove(event)" ondragend="pairingDragEnd(event)" style="height: 160px;" id="draggable-0" data-draggable-sort="3" data-value="assets/files/soal/bc23357930/bc23357930_3.jpg">
+										<span class="d-flex flex-nowrap bg-white position-absolute top-0 left-0 w-100 px-3" style="z-index: 200">
+											<i class="bi bi-grid-3x2-gap-fill ms-auto fs-4 text-primary" style="cursor: grab"></i>
+											<a role="button" class="text-primary remove-dropped text-decoration-none d-none ms-2 fs-4" onclick="removeDroppedPairing(event)">×</a>
+										</span>
+										${(item.has_image) ? `<img src="${ADMIN_URL + item.answer_key}" class="img-fluid mt-3" style="height: 140px">` : `<p class="m-auto h5">${item.answer_key}</p>`}
+										
+									</div>
+								</div>
+								<div class="box-answer-body text-white p-2 bg-primary-400 rounded">
+									<div class="box-answer-drop d-flex justify-content-center align-items-center rounded bg-primary-600" ondragover="pairingDragOver(event)" ondragleave="pairingDragLeave(event)" ondrop="pairingDrop(event)" style="height: 160px" id="dropzone-0" data-dropzone-sort="1" data-value="${item.answer_value}">
+										<h4>${item.answer_value}</h4>
+									</div>
+								</div>
+
+							</div>
+						`);
+					});
+				}
+
+				// Jika soal seret lepas
+				if (soal.type == '6') {
+					$('.pairing-answer').addClass('d-none'); // hide pairing answer
+
+					// show drag and drop answer
+					$('.dragdrop-answer').removeClass('d-none');
+					// section soal
+					$('.dragdrop-answer .list-dragdrop').html('');
+					// examp title
+					$('.question-type h5').html(`<i class="bi bi-stack text-white fs-4"></i> Seret Lepas`);
+					// loop text answer
+					soal.drag_and_drop.forEach((item, index) => {
+						console.log(item);
+						$('.list-drag-drop').append(`
+							<span class="h3 answer-item bg-primary-300 p-2 rounded-3 text-white m-1">${item.answer_correct}</span>	
+						`);
+					});
+				}
+
 				// FOOTER SECTION
 				$('.soal-footer .exam-title').text($('input[name="a_title"]').val());
 				$('.soal-footer .subject-name').text($('select[name="select-mapel"] option:selected').text());
@@ -483,7 +555,7 @@ function editJumlahSoal() {
 
 	// validasi jumlah soal
 	if (newJumlahSoal < jumlahSoal) {
-		alert('Jumlah soal tidak boleh kurang dari jumlah soal yang sudah ditambahkan');
+		alertValidation('Jumlah soal tidak boleh kurang dari jumlah soal yang sudah ditambahkan');
 		return;
 	}
 
@@ -562,6 +634,14 @@ function addSoal() {
 	jenisSoalActive = jenisSoal;
 	activeCard = dataCard;
 
+	// LIMIT JUMLAH SOAL AKTIF START
+	let jumlahSoalCurrent = $(event.target)[0].children[0].innerHTML;
+    let jumlahSoalActiveMax = $(event.target)[0].children[1].innerHTML;
+
+	$('.jumlah-soal-current').text(jumlahSoalCurrent);
+	$('.jumlah-soal-active-max').text(jumlahSoalActiveMax);
+	// LIMIT JUMLAH SOAL AKTIF END
+
 	// call table list question bank
 	let questionIds = [];
 	let inputQuestionIds = document.getElementsByName('question_id[]');
@@ -594,7 +674,7 @@ function addQuestion(e) {
 
 	// validasi jumlah soal
 	if (listCardItem >= $('#total-soal' + activeCard).text()) {
-		alert('Jumlah soal melebihi batas');
+		alertValidation('Jumlah soal melebihi batas');
 		return;
 	}
 
@@ -610,7 +690,9 @@ function addQuestion(e) {
 	} else if (jenisSoalActive == 3) {
 		actionEdit = 'editTrueOrFalse(this)';
 	} else if (jenisSoalActive == 5) {
-		actionEdit = 'editPairing(this)';
+		actionEdit = 'editMenjodohkan(event)';
+	} else if (jenisSoalActive == 6) {
+		actionEdit = 'editDragdrop(event)';
 	}
 
 
@@ -622,20 +704,23 @@ function addQuestion(e) {
 
 				const parentSoal = document.querySelector('div.card-group-custom[data="' + activeCard + '"]');
 				const emptyStat = parentSoal.querySelector('.empty-soal-image');
-				const dto = parentSoal.querySelector('ol.list-soal-container-ol');
+				const dto = parentSoal.querySelector('.list-soal-container');
+				const li = document.createElement('div');
 
-				if (dto.querySelectorAll('li').length >= +document.querySelector('#total-soal' + activeCard).innerText) {
-					alert('Jumlah soal melebihi batas');
+
+				if (emptyStat)
+					emptyStat.classList.add('d-none');
+
+				if (dto.querySelectorAll('div.card').length >= +document.querySelector('#total-soal' + activeCard).innerText) {
+					alertValidation('Jumlah soal melebihi batas');
 					return false;
 				}
 
-				const li = document.createElement('li');
-
-				li.classList.add('list-group-item', 'position-relative');
+				li.classList.add('card', 'border-start-0', 'border-top-0', 'border-end-0', 'mb-3', 'rounded-0', 'mt-5');
 				li.innerHTML = tmpl(data);
 
 				dto.appendChild(li);
-				document.querySelector('#count-soal' + activeCard).innerText = dto.querySelectorAll('li').length;
+				document.querySelector('#count-soal' + activeCard).innerText = dto.querySelectorAll('div.card').length;
 				sortableInit(dto);
 			})
 			.catch(err => console.error(err));
@@ -742,15 +827,11 @@ function deleteQuestionList(e) {
 	let cardItemLength;
 	// hapus data soal dari list soal
 	console.log($(a).attr("jenis-soal"));
-	if ([5, 6].includes(+$(a).attr("jenis-soal"))) {
-		$(e).closest('li').remove();
-		cardItemLength = a.find('li').length;
-	}
-	else {
-		$(e).closest('.card').remove();
-		// update count soal
-		cardItemLength = (a.find('.card').length);
-	}
+	
+	$(e).closest('.card').remove();
+	// update count soal
+	cardItemLength = (a.find('.card').length);
+	
 	$('#count-soal' + a.attr('data')).text(cardItemLength);
 
 	// reset nomor soal
@@ -950,6 +1031,8 @@ const rowPairingQuestion = document.getElementById('row-pairing-question');
 const btnSubmitPairingQuestion = document.getElementById('btn-submit-pairing-question');
 const btnPairingConfig = document.querySelector('#btn-pairing-config');
 const dialogPairingConfig = document.querySelector('#mdl-pairing-config');
+const colPairingQuestion = document.querySelectorAll('.col-pairing-question');
+let isPairingEdit = false;
 
 const observer = new MutationObserver(mutators => {
 	const mut = mutators[0];
@@ -1011,8 +1094,41 @@ mdlPairingEl.addEventListener('show.bs.modal', e => {
 });
 
 mdlPairingEl.addEventListener('hide.bs.modal', e => {
-
+	isPairingEdit = false;
+	itemPairingIndex = 1;
 	const child = fileAddPairingContainer.children;
+	fileAddPairingPreview.querySelector('button').click();
+
+		Array.from(document.querySelectorAll('div.col-pairing-question')).forEach((item, idx) => {
+
+			const num = item.dataset.index;
+
+			if(num > 1) {
+				item.remove();
+				return;
+			}
+
+			const imagePreview = item.querySelector(`#q-image-preview-${num}`);
+			const lblImagePreview = item.querySelector('label[for="arahan-image-' + num + '"]');
+			const inputKey = item.querySelector('[name="input-key[]"]');
+			const filePairingKey = item.querySelector('[name="q-image[]"]');
+
+			lblImagePreview.classList.add('d-none');
+			inputKey.classList.remove('d-none');
+
+			lblImagePreview.removeEventListener('dragover', dragOverImage);
+			lblImagePreview.removeEventListener('drop', dropImage);
+			imagePreview.removeAttribute('src');
+
+			filePairingKey.removeEventListener('change', loadFileFromLocal);
+
+			item.querySelector('input[name="is-image-match[]"]').removeAttribute('checked');
+
+			if((idx + 1) > 2)
+				delete item;
+		})
+	formPairing.reset();
+
 	observer.disconnect();
 
 });
@@ -1063,18 +1179,28 @@ btnPairingConfig.addEventListener('click', e => {
 
 formPairing.addEventListener('submit', async e => {
 	e.preventDefault();
+
+	// AMBIL JUMLAH SOAL DAN LIMIT SOAL DARI HEADER, NANTI AKAN DI PAKAI UNTUK AUTO CLOSE KETIKA SOAL SUDAH MENCAPAI LIMIT
+	let jumlahSoalCurrent = $('#mdl-add-pairing').find('.jumlah-soal-current').text();
+	jumlahSoalCurrent = parseInt(jumlahSoalCurrent);
+	let limitSoalCurrent = $('#mdl-add-pairing').find('.jumlah-soal-active-max').text();
+	limitSoalCurrent = parseInt(limitSoalCurrent);
+
 	const formData = new FormData(e.target);
 
 
-	Swal.fire({
-		icon: '',
-		html: '<div class="d-flex flex-column align-items-center">'
-			+ '<span class="spinner-border text-primary"></span>'
-			+ '<h3 class="mt-2">Loading...</h3>'
-			+ '<div>',
-		showConfirmButton: false,
-		width: '10rem'
-	});
+	// loading
+		Swal.fire({
+			icon: 'info',
+			title: 'Loading...',
+			text: 'Mohon tunggu, data sedang diproses',
+			allowOutsideClick: false,
+			showConfirmButton: false,
+			didOpen: () => {
+				Swal.showLoading();
+			}
+		});
+	// end loading
 
 	Array.from(document.querySelectorAll('input[name="is-image-match[]"]')).forEach(i => {
 		let chk = 'off';
@@ -1086,10 +1212,17 @@ formPairing.addEventListener('submit', async e => {
 	formData.append('mapel', document.querySelector('#select-mapel').value);
 	formData.append('kelas', document.querySelector('#select-kelas').value);
 	formData.append('config[scores]', document.querySelector('#pairing-config-score').value);
+	
 	formData.append(csrfTokenName.content, csrfTokenHash.content);
 
 	try {
-		const f = await fetch(`${BASE_URL}asesmen_standard/create_pairing_question`, {
+
+		let url = `${BASE_URL}asesmen_standard/create_pairing_question`;
+		if(isPairingEdit) {
+			url = `${BASE_URL}asesmen_standard/edit_pairing_question`;
+			formData.append('id', formPairing['item-id'].value);
+		}
+		const f = await fetch(url, {
 			method: 'POST',
 			body: formData
 		});
@@ -1115,7 +1248,7 @@ formPairing.addEventListener('submit', async e => {
 		}
 
 
-		if (resp.soal_id) {
+		if (resp.soal_id && !isPairingEdit) {
 			fetch(`${BASE_URL}asesmen_standard/get_pairing_question_by_id?question_id=${resp.soal_id}`)
 				.then(res => res.json())
 				.then(res => {
@@ -1123,26 +1256,46 @@ formPairing.addEventListener('submit', async e => {
 
 					const parentSoal = document.querySelector('div.card-group-custom[data="' + activeCard + '"]');
 					const emptyStat = parentSoal.querySelector('.empty-soal-image');
-					const dto = parentSoal.querySelector('ol.list-soal-container-ol');
-					const li = document.createElement('li');
+					const dto = parentSoal.querySelector('.list-soal-container');
+					const li = document.createElement('div');
+					li.classList.add('card', 'border-start-0', 'border-top-0', 'border-end-0', 'mb-3', 'rounded-0', 'mt-5');
+					// activeCard
 
-
-					if (!emptyStat.classList.contains('d-none'))
+					if (emptyStat) {
 						emptyStat.classList.add('d-none');
+					}
 
-					if (dto.querySelectorAll('li').length >= +document.querySelector('#total-soal' + activeCard).innerText) {
-						alert('Jumlah soal melebihi batas');
+					if (dto.querySelectorAll('div.card').length >= +document.querySelector('#total-soal' + activeCard).innerText) {
+						alertValidation('Jumlah soal melebihi batas');
 						return false;
 					}
 
-					li.classList.add('list-group-item', 'position-relative');
+					
 					li.innerHTML = tmplPairingDisplay(data);
 
 					dto.appendChild(li);
-					document.querySelector('#count-soal' + activeCard).innerText = dto.querySelectorAll('li').length;
+					document.querySelector('#count-soal' + activeCard).innerText = dto.querySelectorAll('div.card').length;
 					sortableInit(dto);
+
+					// update jumlah soal current card
+					$('.jumlah-soal-current').text(dto.querySelectorAll('div.card').length);
+
+					// KETIKA JUMLAH SOAL SUDAH SAMA DENGAN LIMIT SOAL MAKA TUTUP MODAL
+					if (jumlahSoalCurrent+1 >= limitSoalCurrent) {
+						setTimeout(()=>{$('#mdl-add-pairing .btn-back').click()}, 2000);
+					}
 				})
 				.catch(err => err.responseText)
+		} else {
+			fetch(`${BASE_URL}asesmen_standard/get_pairing_question_by_id?question_id=${resp.soal_id}`)
+				.then(res => res.json())
+				.then(res => {
+					const data = res.data;
+					data.edit = true;
+
+					console.log(questionCardActive);
+					$(questionCardActive).html(tmplPairingDisplay(data));
+				});
 		}
 
 		Swal.fire({
@@ -1151,14 +1304,18 @@ formPairing.addEventListener('submit', async e => {
 			html: '<span class="text-success">' + resp.message + '</span>',
 			timer: 2000
 		}).then(t => {
-			mdlPairing.hide();
+			// mdlPairing.hide();
+			document.getElementsByName('frm-pairing-question')[0].reset();
+			$('#img-pairing-preview img').attr('src', '');
+			$('.img-file-add-container').removeClass('d-none');
 		});
 
 	} catch (err) {
+		console.log(err);
 		Swal.fire({
 			icon: 'error',
 			title: '<h5 class="text-danger text-uppercase">Error</h5>',
-			html: '<span class="text-danger">Unkowm Error Ocucured</span>',
+			html: '<span class="text-danger">Unkowm Error Ocurred</span>',
 			timer: 2000
 		});
 	}
@@ -1214,40 +1371,44 @@ function chkImageSelection() {
 	Array.from(document.querySelectorAll('div.col-pairing-question')).forEach((item, idx) => {
 		const num = item.dataset.index;
 
-		const imagePreview = item.querySelector(`#q-image-preview-${num}`);
-		const lblImagePreview = item.querySelector('label[for="arahan-image-' + num + '"]');
-		const inputKey = item.querySelector('[name="input-key[]"]');
-		const filePairingKey = item.querySelector('[name="q-image[]"]');
-
-		imagePreview.style.textIndent = '-10000px';
-
 		item.querySelector('input[name="is-image-match[]"]').addEventListener('click', e => {
-
-			if (e.target.checked) {
-				lblImagePreview.classList.remove('d-none');
-				inputKey.classList.add('d-none');
-
-				lblImagePreview.addEventListener('dragover', dragOverImage);
-				lblImagePreview.addEventListener('drop', dropImage);
-
-				filePairingKey.addEventListener('change', loadFileFromLocal);
-			}
-			else {
-				lblImagePreview.classList.add('d-none');
-				inputKey.classList.remove('d-none');
-
-				lblImagePreview.removeEventListener('dragover', dragOverImage);
-				lblImagePreview.removeEventListener('drop', dropImage);
-				imagePreview.removeAttribute('src');
-
-				filePairingKey.removeEventListener('change', loadFileFromLocal);
-			}
+			toggleImageAndText(e, item, num);
 		});
 	});
 }
 
 function dragOverImage(e) {
 	e.preventDefault();
+}
+
+function toggleImageAndText(e, item, num) {
+
+	const imagePreview = item.querySelector(`#q-image-preview-${num}`);
+	const lblImagePreview = item.querySelector('label[for="arahan-image-' + num + '"]');
+	const inputKey = item.querySelector('[name="input-key[]"]');
+	const filePairingKey = item.querySelector('[name="q-image[]"]');
+
+	imagePreview.style.textIndent = '-10000px';
+
+	if (e.target.checked) {
+		lblImagePreview.classList.remove('d-none');
+		inputKey.classList.add('d-none');
+
+		lblImagePreview.addEventListener('dragover', dragOverImage);
+		lblImagePreview.addEventListener('drop', dropImage);
+
+		filePairingKey.addEventListener('change', loadFileFromLocal);
+	}
+	else {
+		lblImagePreview.classList.add('d-none');
+		inputKey.classList.remove('d-none');
+
+		lblImagePreview.removeEventListener('dragover', dragOverImage);
+		lblImagePreview.removeEventListener('drop', dropImage);
+		imagePreview.removeAttribute('src');
+
+		filePairingKey.removeEventListener('change', loadFileFromLocal);
+	}
 }
 
 function dropImage(e) {
@@ -1275,40 +1436,44 @@ function loadFileFromLocal(e) {
 }
 
 function tmplPairingDisplay(data) {
-	const tmpl = `<div class="row py-4">
-						<input type="text" class="d-none" name="question_id[]" value="${data.soal_id}"/>
-						<div class="col-8 py-4"></div>
-						<div class="col-4 pan-action position-relative">
-							<div class="w-100 h-100 bg-white d-flex flex-wrap flex-grow-0 justify-content-end align-items-top btn-group-pairing-shown">
-								<button type="button" class="btn btn-light d-flex align-items-center border rounded-3 me-2" disabled>
-									<img src="assets/images/icons/light-bulb.svg" class="me-2" width="16" height="16">Respon
-								</button>
-								<button type="button" class="btn btn-light d-flex align-items-center border rounded-3 me-2" disabled>
-									<img src="assets/images/icons/point-ribbon.svg" class="me-2" width="16" height="16">${data.point} Poin
-								</button>
-							</div>
-							<div class="d-flex btn-group-pairing-hidden justify-content-end align-items-center position-absolute top-0 left-0">
-										
+	const parentSoal = document.querySelector('div.card-group-custom[data="' + activeCard + '"]');
+	const dto = parentSoal.querySelector('.list-soal-container');
+
+	const tmpl = `<div class="card-body py-4">
+						<input type="hidden" name="question_id[]" value="${data.soal_id}"/>
+					<div class="bg-white border-0 p-0">
+						<div class="d-flex justify-content-between">
+							<div class="btn btn-light border rounded-3 no-soal" style="width: 100px;">${(data.edit) ? questionNumberActive : dto.querySelectorAll('div.card').length + 1}</div>
+							<div class="d-flex btn-group-fill-the-blank" onmouseenter="showBtnGroupFillTheBlankHover(this)">
 								<button class="btn btn-light border rounded-3 me-2">
-									<i class="fa-solid fa-eye"></i> Tinjau Soal
+									<i class="fa-solid fa-ribbon me-2" aria-hidden="true"></i>10 Poin
 								</button>
-								
-								<button class="btn btn-light border rounded-3 me-2" onclick="">
-									<i class="fa fa-edit me-2"></i> Ubah Soal
+
+							</div>
+
+							<div class="d-flex btn-group-fill-the-blank-hover d-none" onmouseleave="showBtnGroupFillTheBlank(this)">
+
+								<button class="btn btn-light border rounded-3 me-2" onclick="tinjauSoal(this)">
+									<i class="fa-solid fa-eye" aria-hidden="true"></i> Tinjau Soal
 								</button>
-								
+
+								<button class="btn btn-light border rounded-3 me-2" onclick="editMenjodohkan(this)">
+									<i class="fa fa-edit me-2" aria-hidden="true"></i> Ubah Soal
+								</button>
+
 								<button class="btn btn-light border rounded-3 me-2" onclick="deleteQuestionList(this)">
-									<i class="fa fa-trash"></i>
+									<i class="fa fa-trash" aria-hidden="true"></i>
 								</button>
-								
+
 							</div>
 						</div>
+					</div>
 						${data.question_file ?
 			`<div class="col-6 mt-3">
 								<img src="${ADMIN_URL + data.question_file}" class="img-fluid" style="height: 180px"/>
 							</div><div class="col-6"></div>` : ``
 		}
-						<div class="col-12 my-3">
+						<div class="col-12 my-3 question-text">
 							${data.question}
 						</div>
 						<div class="col-12">
@@ -1318,9 +1483,9 @@ function tmplPairingDisplay(data) {
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-6 d-flex flex-wrap">
+						<div class="col-6 d-flex flex-wrap answer-container">
 						${data.answer.map(tpl => {
-			let mpl = '<div class="col-6 d-flex align-items-center">';
+			let mpl = '<div class="col-6 d-flex align-items-center mb-2">';
 			if (tpl.has_image == 1)
 				mpl += '<img src="' + ADMIN_URL + tpl.answer_key + '" style="width: 140px; height: 100px">';
 			else
@@ -1340,6 +1505,81 @@ function tmplPairingDisplay(data) {
 
 chkImageSelection();
 
+var questionCardActive; // card active
+function editMenjodohkan(e) {
+	jenisSoalActive = 5;
+	const parentCard = e.parentNode.closest('.card');
+	questionCardActive = parentCard; // card active
+
+	questionNumberActive = parentCard.querySelector('.no-soal').innerText;
+	isPairingEdit = true;
+	const id = parentCard.querySelector('input[name="question_id[]"]');
+	formPairing['item-id'].value = id.value;
+
+	(async () => {
+		
+		try 
+		{
+			const f = await fetch(`${BASE_URL}asesmen_standard/get_pairing_question_by_id?question_id=${id.value}`);
+			const result = await f.json();
+			const data = result.data;
+
+			formPairing['question-text'].value = data.question;
+			
+			if(data.question_file) {
+				fileAddPairingContainer.classList.add('d-none');
+				fileAddPairingPreview.classList.remove('d-none');
+				fileAddPairingPreview.querySelector('img').src = ADMIN_URL + data.question_file;
+			}
+
+			if(data.answer.length > 0) {
+				data.answer.forEach((item, idx) => {
+
+					if(idx > 1) 
+						btnAddPairingQuestion.click();
+
+					const container = document.querySelector('.col-pairing-question[data-index="'+idx+'"]');
+					// const imagePreview = container.querySelector(`#q-image-preview-${idx}`);
+					// const lblImagePreview = container.querySelector('label[for="arahan-image-' + idx + '"]');
+					// const inputKey = container.querySelector('[name="input-key[]"]');
+					// const filePairingKey = container.querySelector('[name="q-image[]"]');
+					
+
+					container.querySelector('input[name="is-image-match[]"]').addEventListener('click', e => {
+						toggleImageAndText(e, container, idx)
+					});
+
+					if(item.has_image == 1) {
+						const inputImageName = container.querySelector('[name="img-name[]"]');
+						document.getElementById('q-image-' + idx).checked = true;
+						const lblImagePreview = document.querySelector('label[for="arahan-image-' + idx + '"]');
+						lblImagePreview.classList.remove('d-none');
+						document.getElementById('q-image-preview-' + idx).src = ADMIN_URL + item.answer_key;
+						inputImageName.value = item.answer_key;
+
+						// lblImagePreview.addEventListener('dragover', dragOverImage);
+						// lblImagePreview.addEventListener('drop', dropImage);
+
+						// filePairingKey.addEventListener('change', loadFileFromLocal);
+					}
+					else 
+						container.querySelector('input[name="input-key[]"]').value = item.answer_key;
+					
+
+					container.querySelector(".input-answer").value = item.answer_value;
+				});
+			}
+			
+		} catch(err)
+		{
+			console.log(err);
+		}
+
+		mdlPairing.show();
+	})()
+	
+}
+
 
 /**
  * ****************************************************
@@ -1347,6 +1587,7 @@ chkImageSelection();
  * ****************************************************
  */
 
+let isDragdropEdit = false;
 const frmDragdrop = document.forms['frm-add-dragdrop'];
 const ddBtnSubmit = document.getElementById('btn-submit-dragdrop-question');
 const ddCloseModal = document.getElementById('dragdrop-close-modal');
@@ -1356,6 +1597,7 @@ const ddMdlConfig = new bootstrap.Modal(document.getElementById('mdl-dragdrop-co
 	focus: false
 });
 
+const ddItemID = document.querySelector('input[name="item-dragdrop-id"]');
 const ddQuestionText = document.getElementById('dragdrop-question-text');
 const ddQuestionTag = document.getElementById('dragdrop-question-tag');
 const ddBtnOkQuestionTag = document.getElementById('ok-question-tag');
@@ -1454,7 +1696,27 @@ mdlAddDragdropEl.addEventListener('show.bs.modal', e => {
 });
 
 mdlAddDragdropEl.addEventListener('hidden.bs.modal', e => {
-	// resetAll();
+	isDragdropEdit = false;
+	resetAll();
+	ddQuestionText.innerHTML = null;
+	ddCorrectAnswer.querySelector('.tag-container').innerHTML = null;
+	ddFileAddPreview.querySelector('.preview-overlay').querySelector('button').click();
+	if(ddSwitchFalseAnswer.checked)
+	{
+		ddSwitchFalseAnswer.removeAttribute('checked');
+		ddFalseAnswerContainer.innerHTML = null;
+	}
+	if(ddResponJawaban.checked)
+	{
+		ddResponJawaban.removeAttribute('checked');
+		ddBtnAnswerResponse.ariaChecked = false;
+		ddBtnAnswerResponse.classList.add('d-none');
+		ddAnswerResponse.classList.remove('show');
+		document.querySelector('input[name="dd-answer-correct-text"]').value = '';
+		document.querySelector('input[name="dd-answer-false-text"]').value = '';
+		ddImgResponseCorrectPreview.querySelector('.preview-overlay').querySelector('button').click();
+		ddImgResponseFalsePreview.querySelector('.preview-overlay').querySelector('button').click();
+	}
 	observeTagAnswer.disconnect();
 });
 
@@ -1481,12 +1743,37 @@ frmDragdrop['file-add'].addEventListener('change', e => {
 
 });
 
+/**
+ * Submit Dragdrop Listener
+ * 
+ */
 frmDragdrop.addEventListener('submit', async e => {
 	e.preventDefault();
+
+	// AMBIL JUMLAH SOAL DAN LIMIT SOAL DARI HEADER, NANTI AKAN DI PAKAI UNTUK AUTO CLOSE KETIKA SOAL SUDAH MENCAPAI LIMIT
+	let jumlahSoalCurrent = $('#mdl-add-dragdrop').find('.jumlah-soal-current').text();
+	jumlahSoalCurrent = parseInt(jumlahSoalCurrent);
+	let limitSoalCurrent = $('#mdl-add-dragdrop').find('.jumlah-soal-active-max').text();
+	limitSoalCurrent = parseInt(limitSoalCurrent);
+
 	const formData = new FormData(e.target);
 
 	formData.append('mapel', document.querySelector('#select-mapel').value);
 	formData.append('kelas', document.querySelector('#select-kelas').value);
+
+	// const allCorrectAnswer = document.querySelectorAll('data-name="correct_answer[]"');
+
+	// if(Array.from(allCorrectAnswer).length == 0)
+	// {
+	// 	Swal.fire({
+	// 		icon: 'error',
+	// 		title: '<h5 class="text-danger text-uppercase">Error</h5>',
+	// 		html: '<span class="text-danger">Masukan paling tidak 1 jawaban benar !!!</span>',
+	// 		timer: 2000
+	// 	});
+
+	// 	return false;
+	// }
 
 	const questionText = createQuestionText(ddQuestionText);
 	formData.append('question', questionText);
@@ -1495,6 +1782,7 @@ frmDragdrop.addEventListener('submit', async e => {
 	Array.from(answerData).forEach((item, idx) => {
 		formData.append('answer[' + idx + '][text]', item.innerText);
 		formData.append('answer[' + idx + '][wordsCount]', item.dataset.wordCount);
+		formData.append('answer[' + idx + '][is_correct]', 1);
 	});
 
 	// CONFIG
@@ -1514,8 +1802,10 @@ frmDragdrop.addEventListener('submit', async e => {
 		formData.append('config[falseAnswer]', 1);
 
 		Array.from(ddFalseAnswerContainer.children).forEach((item, idx) => {
-			formData.append('falseAnswer[' + idx + '][text]', item.innerText);
-			formData.append('falseAnswer[' + idx + '][wordsCount]', item.dataset.wordCount);
+			const fa = item.querySelector('.input-false-answer');
+			formData.append('falseAnswer[' + idx + '][text]', fa.innerText);
+			formData.append('falseAnswer[' + idx + '][wordsCount]', fa.dataset.wordCount);
+			formData.append('falseAnswer[' + idx + '][is_correct]', 0);
 		});
 	}
 	else {
@@ -1525,18 +1815,28 @@ frmDragdrop.addEventListener('submit', async e => {
 	formData.append(csrfTokenName.content, csrfTokenHash.content);
 
 
-	Swal.fire({
-		icon: '',
-		html: '<div class="d-flex flex-column align-items-center">'
-			+ '<span class="spinner-border text-primary"></span>'
-			+ '<h3 class="mt-2">Loading...</h3>'
-			+ '<div>',
-		showConfirmButton: false,
-		width: '10rem'
-	});
+	// loading
+		Swal.fire({
+			icon: 'info',
+			title: 'Loading...',
+			text: 'Mohon tunggu, data sedang diproses',
+			allowOutsideClick: false,
+			showConfirmButton: false,
+			didOpen: () => {
+				Swal.showLoading();
+			}
+		});
+	// end loading
 
 
 	try {
+		let url = `${BASE_URL}/asesmen_standard/create_dragdrop_question`;
+		if(isDragdropEdit)
+		{
+			url = `${BASE_URL}/asesmen_standard/edit_dragdrop_question`;
+			formData.append('id', ddItemID.value)
+		}
+
 		const f = await fetch(`${BASE_URL}/asesmen_standard/create_dragdrop_question`, {
 			method: 'POST',
 			body: formData
@@ -1577,27 +1877,41 @@ frmDragdrop.addEventListener('submit', async e => {
 
 						const parentSoal = document.querySelector('div.card-group-custom[data="' + activeCard + '"]');
 						const emptyStat = parentSoal.querySelector('.empty-soal-image');
-						const dto = parentSoal.querySelector('ol.list-soal-container-ol');
-						const li = document.createElement('li');
+						const dto = parentSoal.querySelector('.list-soal-container');
+						const li = document.createElement('div');
+						li.classList.add('card', 'border-start-0', 'border-top-0', 'border-end-0', 'mb-3', 'rounded-0', 'mt-5');
+						// activeCard
 
-						if (!emptyStat.classList.contains('d-none'))
+						if (emptyStat) {
 							emptyStat.classList.add('d-none');
-
-						if (dto.querySelectorAll('li').length >= +document.querySelector('#total-soal' + activeCard).innerText) {
-							alert('Jumlah soal melebihi batas');
-							return false;
 						}
 
-						li.classList.add('list-group-item', 'position-relative');
+						if (dto.querySelectorAll('div.card').length >= +document.querySelector('#total-soal' + activeCard).innerText) {
+							alertValidation('Jumlah soal melebihi batas');
+							return false;
+						}
 						li.innerHTML = tmplDragdropDisplay(data);
 
 						dto.appendChild(li);
-						document.querySelector('#count-soal' + activeCard).innerText = dto.querySelectorAll('li').length;
+						document.querySelector('#count-soal' + activeCard).innerText = dto.querySelectorAll('div.card').length;
 						sortableInit(dto);
+
+						// update jumlah soal current card
+						$('.jumlah-soal-current').text(dto.querySelectorAll('div.card').length);
+
+						// KETIKA JUMLAH SOAL SUDAH SAMA DENGAN LIMIT SOAL MAKA TUTUP MODAL
+						if (jumlahSoalCurrent+1 >= limitSoalCurrent) {
+							setTimeout(()=>{$('#mdl-add-dragdrop .btn-back').click()}, 2000);
+						}
 					})
 					.catch(err => console.error(err));
 
 			});
+			// mdlAddDragdrop.hide();
+			document.getElementsByName('frm-add-dragdrop')[0].reset();
+			$('#img-dragdrop-preview img').attr('src', '');
+			$('.img-file-add-container').removeClass('d-none');
+			$('#dragdrop-question-text').text('');
 	}
 	catch (err) {
 		Swal.fire({
@@ -1696,17 +2010,37 @@ ddBtnFalseAnswer.addEventListener('click', e => {
 });
 
 ddOkFalseAnswer.addEventListener('click', e => {
+	const cont  = document.createElement('div');
+	cont.classList.add('d-inline-block', 'position-relative', 'input-false-parent');
 	const input = document.createElement('span');
 	input.disabled = true;
 	input.style.width = 'auto';
-	input.classList.add('mx-1', 'px-2', 'py-1', 'bg-white', 'rounded', 'text-dark', 'input-false-answer');
+	input.classList.add('mx-2', 'px-2', 'py-1', 'bg-white', 'rounded', 'text-dark', 'input-false-answer');
 	input.contentEditable = false;
 	input.role = 'textbox';
 	input.dataset.name = 'false-answer[]';
 	input.dataset.wordCount = ddInputFalseAnswerContainer.querySelector('input').value.trim().length;
 	input.innerHTML = ddInputFalseAnswerContainer.querySelector('input').value.trim();
+	cont.appendChild(input);
+	// add cancel button
+	const cancelBtn = document.createElement('button');
+	cancelBtn.classList.add('btn', 'p-0', 'd-flex', 'bg-dark','justify-content-center', 'text-white', 'rounded-circle', 'align-items-center', 'position-absolute');
+	cancelBtn.style.height = '16px';
+	cancelBtn.style.width = '16px';
+	cancelBtn.style.marginRight = '-3px';
+	cancelBtn.style.marginTop = '-6px';
+	cancelBtn.style.top = '-3px';
+	cancelBtn.style.left = 'auto';
+	cancelBtn.style.right = 0;
+	cancelBtn.style.lineHeight = '0px';
+	cancelBtn.innerHTML = '&times;';
+	cancelBtn.onclick = e => {
+		const parent = e.target.parentNode.closest('div.input-false-parent');
+		parent.remove();
+	}
+	cont.appendChild(cancelBtn);
 
-	ddFalseAnswerContainer.appendChild(input);
+	ddFalseAnswerContainer.appendChild(cont);
 	ddCancelFalseAnswer.click();
 });
 
@@ -1874,15 +2208,14 @@ function createQuestionText(element) {
 			if (item.nodeName == 'SPAN' && item.classList.contains('input-text-answer')) {
 				const wordsCount = item.dataset.wordCount;
 				let emptyStr = '';
-				out = '<span class="drop-box" data-value="'+item.dataset.noUrut+'">....</span>';
+				out = '<span class="drop-box" data-value="' + item.dataset.noUrut + '">....</span>';
 			}
 			else {
 				out = item.textContent;
 			}
 
 			return out;
-		})
-			.join('');
+		}).join('');
 
 	}
 
@@ -1890,40 +2223,44 @@ function createQuestionText(element) {
 }
 
 function tmplDragdropDisplay(data) {
-	const tmpl = `<div class="row py-4">
-						<input type="text" class="d-none" name="question_id[]" value="${data.soal_id}"/>
-						<div class="col-8 py-4"></div>
-						<div class="col-4 pan-action position-relative">
-							<div class="w-100 h-100 bg-white d-flex flex-wrap flex-grow-0 justify-content-end align-items-top btn-group-pairing-shown">
-								<button type="button" class="btn btn-light d-flex align-items-center border rounded-3 me-2" disabled>
-									<img src="assets/images/icons/light-bulb.svg" class="me-2" width="16" height="16">Respon
-								</button>
-								<button type="button" class="btn btn-light d-flex align-items-center border rounded-3 me-2" disabled>
-									<img src="assets/images/icons/point-ribbon.svg" class="me-2" width="16" height="16">10 Poin
-								</button>
-							</div>
-							<div class="d-flex btn-group-pairing-hidden justify-content-end align-items-center position-absolute top-0 left-0">
-										
+	const parentSoal = document.querySelector('div.card-group-custom[data="' + activeCard + '"]');
+	const dto = parentSoal.querySelector('.list-soal-container');
+
+	const tmpl = `<div class="card-body py-4">
+					<input type="hidden" name="question_id[]" value="${data.soal_id}"/>
+					<div class="bg-white border-0 p-0">
+						<div class="d-flex justify-content-between">
+							<div class="btn btn-light border rounded-3 no-soal" style="width: 100px;">${dto.querySelectorAll('div.card').length + 1}</div>
+							<div class="d-flex btn-group-fill-the-blank" onmouseenter="showBtnGroupFillTheBlankHover(this)">
 								<button class="btn btn-light border rounded-3 me-2">
-									<i class="fa-solid fa-eye"></i> Tinjau Soal
+									<i class="fa-solid fa-ribbon me-2" aria-hidden="true"></i>10 Poin
 								</button>
-								
-								<button class="btn btn-light border rounded-3 me-2" onclick="">
-									<i class="fa fa-edit me-2"></i> Ubah Soal
+
+							</div>
+
+							<div class="d-flex btn-group-fill-the-blank-hover d-none" onmouseleave="showBtnGroupFillTheBlank(this)">
+
+								<button class="btn btn-light border rounded-3 me-2" onclick="tinjauSoal(this)">
+									<i class="fa-solid fa-eye" aria-hidden="true"></i> Tinjau Soal
 								</button>
-								
+
+								<button class="btn btn-light border rounded-3 me-2" onclick="editDragdrop(this)">
+									<i class="fa fa-edit me-2" aria-hidden="true"></i> Ubah Soal
+								</button>
+
 								<button class="btn btn-light border rounded-3 me-2" onclick="deleteQuestionList(this)">
-									<i class="fa fa-trash"></i>
+									<i class="fa fa-trash" aria-hidden="true"></i>
 								</button>
-								
+
 							</div>
 						</div>
+					</div>
 						${data.question_file ?
-			`<div class="col-6 my-3">
-								<img src="${ADMIN_URL + data.question_file}" class="img-fluid" height="260"/>
+				`<div class="col-6 my-3">
+								<img src="${ADMIN_URL + data.question_file}" class="img-fluid" style="height: 200px"/>
 							</div><div class="col-6"></div>` : ``
 		}
-						<div class="col-12">
+						<div class="col-12 mt-2">
 							<h5>${data.question}</h5>
 						</div>
 						
@@ -1933,14 +2270,14 @@ function tmplDragdropDisplay(data) {
 						${data.answer.map(tpl => {
 			let mpl = '<div class="col-6 d-flex align-items-center mb-2 fs-5">';
 			mpl += '<i class="bi bi-record-circle"></i>';
-			mpl += '<span class="d-inline-block ms-1">' + tpl.answer_correct + '</span>';
+			mpl += '<span class="d-inline-block ms-1">' + tpl.answer + '</span>';
 			mpl += '</div>';
-			if (tpl.answer_false) {
-				mpl += '<div class="col-6 d-flex align-items-center mb-2 fs-5">';
-				mpl += '<i class="bi bi-record-circle"></i>';
-				mpl += '<span class="d-inline-block ms-1">' + tpl.answer_false + '</span>';
-				mpl += '</div>';
-			}
+			// if (tpl.answer_false) {
+			// 	mpl += '<div class="col-6 d-flex align-items-center mb-2 fs-5">';
+			// 	mpl += '<i class="bi bi-record-circle"></i>';
+			// 	mpl += '<span class="d-inline-block ms-1">' + tpl.answer_false + '</span>';
+			// 	mpl += '</div>';
+			// }
 			return mpl;
 		}).join('')}
 						</div>
@@ -1949,9 +2286,145 @@ function tmplDragdropDisplay(data) {
 	return tmpl;
 }
 
+function editDragdrop(e) {
+	jenisSoalActive = 6;
+	isDragdropEdit = true;
+	const parentCard = e.parentNode.closest('.card');
+	questionNumberActive = parentCard.querySelector('.no-soal').innerText;
+	const id = parentCard.querySelector('input[name="question_id[]"]');
+	ddItemID.value = id;
+
+	(async () => {
+		try
+		{	
+			const f = await fetch(`${BASE_URL}asesmen_standard/get_one_dragdrop_question/${id.value}`);
+			const resp = await f.json();
+			const data = resp.data;
+
+			if(data.question_file && data.question_file.length > 0) {
+				fileAddContainer.classList.add('d-none');
+				ddFileAddPreview.classList.remove('d-none');
+				ddFileAddPreview.querySelector('img').src = ADMIN_URL + data.question_file;
+			}
+			ddQuestionText.innerHTML = data.question;
+
+			const jaBenar = data.answer.filter(item => item.is_correct == 1);
+			const jaSalah = data.answer.filter(item => item.is_correct == 0);
+
+			Array.from(jaBenar, (item, idx) =>  {
+				console.log(item);
+				// scan span sesuai nomor
+				const tobeReplace = ddQuestionText.querySelector(`.drop-box[data-value="${item.urutan}"]`);
+				
+				// buat input
+				const input = document.createElement('span');
+				input.disabled = true;
+				input.style.width = 'auto';
+				input.classList.add('mx-1', 'px-2', 'py-1', 'bg-white', 'rounded', 'text-dark', 'input-text-answer');
+				input.contentEditable = false;
+
+				input.innerText = item.answer;
+				input.dataset.wordCount = item.words_count;
+				input.dataset.name = 'correct-answer[]';
+				input.dataset.noUrut = item.urutan;
+				input.role = 'textbox';
+				// replace span pake input
+				ddQuestionText.replaceChild(input, tobeReplace);
+				const cloner = input.cloneNode(true);
+				ddCorrectAnswer.querySelector('.tag-container').appendChild(cloner);
+			});
+			
+			// Wrong Answers
+			if(jaSalah.length > 0) {
+				ddSwitchFalseAnswer.checked = true;
+				
+				Array.from(jaSalah, item => {
+					const cont  = document.createElement('div');
+					cont.classList.add('d-inline-block', 'position-relative', 'input-false-parent');
+					const input = document.createElement('span');
+					input.disabled = true;
+					input.style.width = 'auto';
+					input.classList.add('mx-2', 'px-2', 'py-1', 'bg-white', 'rounded', 'text-dark', 'input-false-answer');
+					input.contentEditable = false;
+					input.role = 'textbox';
+					input.dataset.name = 'false-answer[]';
+					input.dataset.wordCount = item.words_count;
+					input.innerHTML = item.answer;
+					cont.appendChild(input);
+					// add cancel button
+					const cancelBtn = document.createElement('button');
+					cancelBtn.classList.add('btn', 'p-0', 'd-flex', 'bg-dark','justify-content-center', 'text-white', 'rounded-circle', 'align-items-center', 'position-absolute');
+					cancelBtn.style.height = '16px';
+					cancelBtn.style.width = '16px';
+					cancelBtn.style.marginRight = '-3px';
+					cancelBtn.style.marginTop = '-6px';
+					cancelBtn.style.top = '-3px';
+					cancelBtn.style.left = 'auto';
+					cancelBtn.style.right = 0;
+					cancelBtn.style.lineHeight = '0px';
+					cancelBtn.innerHTML = '&times;';
+					cancelBtn.onclick = e => {
+						const parent = e.target.parentNode.closest('div.input-false-parent');
+						parent.remove();
+					}
+					cont.appendChild(cancelBtn);
+
+					ddFalseAnswerContainer.appendChild(cont);
+				});
+
+				ddFalseAnswer.parentNode.closest('.col').classList.remove('d-none');
+			}
+
+			// Response Answer
+			if(data.response_correct_answer && data.response_correct_answer.length > 0) {
+				ddResponJawaban.checked = true;
+				ddBtnAnswerResponse.classList.remove('d-none');
+				document.querySelector('input[name="dd-answer-correct-text"]').value = data.response_correct_answer;
+
+				if(data.response_correct_answer_file && data.response_correct_answer_file.length > 0) {
+					ddLblResponseCorrect.querySelector('.img-file-add-container').classList.add('d-none');
+					ddImgResponseCorrectPreview.classList.remove('d-none');
+					ddImgResponseCorrectPreview.querySelector('img').src = ADMIN_URL +  data.response_correct_answer_file;
+				}
+			}
+
+			if(data.response_wrong_answer && data.response_wrong_answer.length > 0) {
+				ddResponJawaban.checked = true;
+				ddBtnAnswerResponse.classList.remove('d-none');
+				document.querySelector('input[name="dd-answer-false-text"]').value = data.response_wrong_answer;
+
+				if(data.response_wrong_answer_file && data.response_wrong_answer_file.length > 0) {
+					ddLblResponseFalse.querySelector('.img-file-add-container').classList.add('d-none');
+					ddImgResponseFalsePreview.classList.remove('d-none');
+					ddImgResponseFalsePreview.querySelector('img').src = ADMIN_URL +  data.response_wrong_answer_file;
+				}
+			}
+		}
+		catch(err) {
+			console.error(err);
+		}
+
+		mdlAddDragdrop.show();
+	})();
+
+}
+
+// function alert validation sweet alert
+function alertValidation(message) {
+	Swal.fire({
+		icon: 'error',
+		title: 'Gagal',
+		text: message,
+		backdrop: true,
+		allowOutsideClick: false,
+	});
+}
+
+
 // Simpan Draft Asesmen
 let isPublish = false;
 $('#save-draft').on('click', () => {
+
 	// validation jika waktu mulai lebih besar dari waktu berakhir
 	let start_date = $('#a_start').val();
 	let end_date = $('#a_end').val();
@@ -1965,7 +2438,7 @@ $('#save-draft').on('click', () => {
 	}
 
 	// validasi jika soal belum diisi
-	if($('input[name="question_id[]"]').length == 0) {
+	if ($('input[name="question_id[]"]').length == 0) {
 		Swal.fire({
 			icon: 'error',
 			title: 'Gagal',
@@ -1974,70 +2447,119 @@ $('#save-draft').on('click', () => {
 		return;
 	}
 
-	let exam_id = $('input[name="exam_id"]').val();
-	let cardGroupCustom = $('.card-group-custom');
+	// validasi jika total soal masih kurang
+		let count = 0;
+		let addSoalContainer = document.querySelectorAll('.add-soal-container');
+		addSoalContainer.forEach(function(el, index){
+			// hitung limit total soal
+			let total = $(`#total-soal${index}`).text();
+			count += parseInt(total);
+		})
+		let totalItemSoal = document.querySelectorAll('.list-soal-container .card').length;
+		// jika item soal lebih kecil dari total limit soal munculkan confirmasi
+		if (count > totalItemSoal) {
+			// tampilkan sweet alert konfirmasi
+			Swal.fire({
+				icon: 'warning',
+				title: 'Perhatian',
+				text: 'Jumlah soal yang diisi masih kurang dari total soal yang ditentukan. Apakah Anda ingin melanjutkan?',
+				showCancelButton: true,
+				confirmButtonText: 'Ya, lanjutkan',
+				cancelButtonText: 'Tidak, batalkan',
+			}).then((result) => {
+				if (result.isConfirmed) {
+					saveDraft();
+				}
+			});
+			return;
+		}
+	saveDraft(); // jika sudah validasi semua maka jalankan fungsi saveDraft
 
-	listSoal = [];
-	cardGroupCustom.each((index, item) => {
-		let data = $(item).attr('data');
-		listSoal[data] = [];
-		console.log(item);
-		const listSoalItem = item.querySelectorAll('input[name="question_id[]"]');
+	// jika sudah validasi semua maka jalankan fungsi saveDraft
+	isPublish = false; // set isPublish ke false
+	
+	function saveDraft() {
 
-		Array.from(listSoalItem).forEach((item2, index2) => {
-			listSoal[data][index2] = {
-				soal_id: item2.value,
-				point: 0,
-				type: $(item).attr('jenis-soal'),
+		// Swal loading
+		Swal.fire({
+			icon: '',
+			html: '<div class="d-flex flex-column align-items-center">'
+				+ '<span class="spinner-border text-primary"></span>'
+				+ '<h3 class="mt-2">Loading...</h3>'
+				+ '<div>',
+			showConfirmButton: false,
+			allowOutsideClick: false,
+			allowEscapeKey: false,
+			allowEnterKey: false,
+			width: '10rem'
+		});
+
+
+		let exam_id = $('input[name="exam_id"]').val();
+		let cardGroupCustom = $('.card-group-custom');
+
+		listSoal = [];
+		cardGroupCustom.each((index, item) => {
+			let data = $(item).attr('data');
+			listSoal[data] = [];
+			console.log(item);
+			const listSoalItem = item.querySelectorAll('input[name="question_id[]"]');
+
+			Array.from(listSoalItem).forEach((item2, index2) => {
+				listSoal[data][index2] = {
+					soal_id: item2.value,
+					point: 0,
+					type: $(item).attr('jenis-soal'),
+				}
+			});
+		});
+
+		let data = {
+			teacher_id: $('input[name="teacher_id"]').val(),
+			exam_id: $('input[name="exam_id"]').val(),
+			subject_id: $('#select-mapel').val(),
+			class_id: $('#select-kelas').val(),
+			category_id: $('#select-category').val(),
+			title: $('#a_title').val(),
+			description: $('#deskripsi').val(),
+			start_date: $('#a_start').val(),
+			end_date: $('#a_end').val(),
+			duration: $('#a_duration').val(),
+			is_update: $('input[name="is_update"]').is(':checked'),
+			questions: listSoal,
+			is_publish: isPublish,
+		};
+
+		if (exam_id) {
+			data.exam_id = exam_id;
+		}
+
+		$.ajax({
+			url: BASE_URL + 'asesmen_standard/save_draft',
+			type: 'POST',
+			data: data,
+			success: function (res) {
+				if (res.success) {
+					Swal.fire({
+						icon: 'success',
+						title: 'Berhasil',
+						text: 'Berhasil menyimpan draft asesmen',
+					});
+
+					// set exam_id
+					// $('input[name="exam_id"]').val(res.data.exam_id);
+
+					window.location.href = BASE_URL + 'asesmen';
+				} else {
+					Swal.fire({
+						icon: 'error',
+						title: 'Gagal',
+						text: 'Gagal menyimpan draft asesmen',
+					});
+				}
 			}
 		});
-	});
-
-	let data = {
-		teacher_id: $('input[name="teacher_id"]').val(),
-		exam_id: $('input[name="exam_id"]').val(),
-		subject_id: $('#select-mapel').val(),
-		class_id: $('#select-kelas').val(),
-		category_id: $('#select-category').val(),
-		title: $('#a_title').val(),
-		description: $('#deskripsi').val(),
-		start_date: $('#a_start').val(),
-		end_date: $('#a_end').val(),
-		duration: $('#a_duration').val(),
-		is_update: $('input[name="is_update"]').is(':checked'),
-		questions: listSoal,
-		is_publish: isPublish,
-	};
-
-	if (exam_id) {
-		data.exam_id = exam_id;
 	}
-
-	$.ajax({
-		url: BASE_URL + 'asesmen_standard/save_draft',
-		type: 'POST',
-		data: data,
-		success: function (res) {
-			if (res.success) {
-				Swal.fire({
-					icon: 'success',
-					title: 'Berhasil',
-					text: 'Berhasil menyimpan draft asesmen',
-				});
-
-				// set exam_id
-				// $('input[name="exam_id"]').val(res.data.exam_id);
-
-				window.location.href = BASE_URL + 'asesmen';
-			} else {
-				Swal.fire({
-					icon: 'error',
-					title: 'Gagal',
-					text: 'Gagal menyimpan draft asesmen',
-				});
-			}
-		}
-	});
 });
 
 // publish asesmen

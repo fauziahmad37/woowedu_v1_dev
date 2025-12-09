@@ -75,6 +75,9 @@ $(document).ready(function () {
 			data: 'exam_score'
 		},
 		{
+			data: 'notes'
+		},
+		{
 			data: null,
 			render: function (data, type, row) {
 				let btn = '';

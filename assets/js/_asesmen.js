@@ -21,19 +21,7 @@ $(document).ready(function () {
 				visible: false
 			},
 			{
-				data: null,
-				render(data, row, type, meta) {
-					let section = ``;
-
-					if (teacher_id) {
-						section = `<a href="${BASE_URL + 'asesmen/exam_student/' + type.exam_id}">${type.title}</a>
-							${(type.status == 0) ? `<span class="ms-2" style="background-color: #DAEBFF;">Dalam Draft</span>` : ''}`;
-					} else {
-						section = `<a>${type.title}</a>
-							${(type.status == 0) ? `<span class="ms-2" style="background-color: #DAEBFF;">Dalam Draft</span>` : ''}`;
-					}
-					return section;
-				}
+				data: 'title',
 			},
 			{
 				data: 'subject_name',
@@ -62,10 +50,15 @@ $(document).ready(function () {
 				visible: (student_id) ? true : false,
 				render(data, type, row, meta) {
 					let submitDt;
+					let startDate = new Date(row.start_date);
 					if (row.exam_submit) {
 						submitDt = moment(row.exam_submit).format('DD MMM YYYY, HH:mm');
 					} else {
 						submitDt = `<h5><span class="badge text-danger bg-danger-subtle p-2" style="font-weight: 600; min-width: 140px;">Belum dikerjakan</span></h5>`
+					
+						if (startDate.getTime() > (new Date().getTime())) {
+							submitDt = `<h5><span class="badge text-warning bg-warning-subtle p-2" style="font-weight: 600; min-width: 140px;">Belum Berlangsung</span></h5>`
+						}
 					}
 					return submitDt
 				}
@@ -76,6 +69,7 @@ $(document).ready(function () {
 				visible: (student_id) ? true : false,
 				render(data, type, row, meta) {
 					let status;
+					let startDate = new Date(row.start_date);
 					let endDate = new Date(row.end_date);
 					// jika exam_submit nya ada dan exam_total_nilai nya null maka status nya menunggu penilaian
 					if (row.exam_submit && !row.exam_total_nilai) {
@@ -88,6 +82,11 @@ $(document).ready(function () {
 						if(endDate.getTime() < (new Date().getTime())){
 							status = `<h5><span class="badge text-dark bg-dark-subtle p-2" style="font-weight: 600; min-width: 140px;">Tidak Mengerjakan</span></h5>`
 						}
+
+						if(startDate.getTime() > (new Date().getTime())){
+							status = `<h5><span class="badge text-warning bg-warning-subtle p-2" style="font-weight: 600; min-width: 140px;">Belum Berlangsung</span></h5>`
+						}
+						
 					}
 					return status
 				}
@@ -110,7 +109,7 @@ $(document).ready(function () {
 					const endDate = new Date(row.end_date);
 
 					if (row.status == 0) {
-						status = `<span class="badge bg-secondary">Draft</span>`
+						status = `<span class="badge text-dark p-2 w-100" style="font-size: 12px; font-weight:600; background-color: #D4D1E9;">Draft</span>`
 					} else {
 						// STATUS SEDANG BERLANGSUNG
 						if(startDate.getTime() <= (new Date().getTime()) && endDate.getTime() >= (new Date().getTime())){
@@ -229,12 +228,12 @@ $(document).ready(function () {
 			},
 			{
 				data: null,
+				className: 'text-center',
 				render(data, row, type, meta) {
 					var view = `<div class="btn-group btn-group-sm float-right">
-                            	${(teacher_id) ? `
-									<a href="${BASE_URL + 'asesmen/view/' + type.exam_id}" class="btn btn-primary view_asesmen"><i class="fa-solid fa-eye text-white"></i></a>` : ``}
+                            	${(teacher_id) ? `<a href="${BASE_URL + 'asesmen/view/' + type.exam_id}" class="btn btn-primary rounded-circle view_asesmen"><i class="fa-solid fa-eye text-white"></i></a>` : ``}
  
-								${(type.status == 1) ? `<a href="${BASE_URL + 'asesmen/do_exercise/' + type.exam_id}" class="btn btn-primary view_student">
+								${(type.status == 1 && student_id) ? `<a href="${BASE_URL + 'asesmen/do_exercise/' + type.exam_id}" class="btn btn-primary view_student">
 								<i class="fa-solid fa-file-pen text-white"></i></a>
 								<button class="btn btn-sm btn-danger delete_asesmen"><i class="fa-solid fa-trash text-white"></i></button>` : ``}
 

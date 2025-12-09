@@ -49,10 +49,10 @@ $('.delete-pic').click(function () {
 
 // edit image
 $('.edit-pic-pg').click(function () {
-	$('#image').click();
+	$('#input_image_question_pg').click();
 
-	$('#image').change(function () {
-		var file = $('#image')[0].files[0];
+	$('#input_image_question_pg').change(function () {
+		var file = $('#input_image_question_pg')[0].files[0];
 		var reader = new FileReader();
 		reader.onload = function (e) {
 			$('.image-place-holder-pg').attr('src', e.target.result);
@@ -342,6 +342,12 @@ $('.btn-pengaturan').click(function () {
 $('.simpan-jawaban-pg').click(function (e) {
 	e.preventDefault();
 
+	// AMBIL JUMLAH SOAL DAN LIMIT SOAL DARI HEADER, NANTI AKAN DI PAKAI UNTUK AUTO CLOSE KETIKA SOAL SUDAH MENCAPAI LIMIT
+	let jumlahSoalCurrent = $(this).closest('.header-options').find('.jumlah-soal-current').text();
+	jumlahSoalCurrent = parseInt(jumlahSoalCurrent);
+	let limitSoalCurrent = $(this).closest('.header-options').find('.jumlah-soal-active-max').text();
+	limitSoalCurrent = parseInt(limitSoalCurrent);
+
 	let pilihan_ganda_id = $('#pilihan_ganda_id').val();
 	let card = $(`.card[data="${activeCard}"]`); // get active card
 	let listCardItem = card.find('.card').length;
@@ -407,7 +413,17 @@ $('.simpan-jawaban-pg').click(function (e) {
 		});
 		return;
 	}
-
+	// tampilkan loading
+	Swal.fire({
+		icon: 'info',
+		allowEscapeKey: false,
+		title: 'Loading...',
+		text: 'Mohon tunggu, data sedang diproses',
+		allowOutsideClick: false,
+		didOpen: () => {
+			Swal.showLoading();
+		}
+	});
 	// ajax post
 	let form = new FormData();
 
@@ -482,6 +498,9 @@ $('.simpan-jawaban-pg').click(function (e) {
 				// jika melakukan update soal maka tidak perlu update counter soal
 				if (!pilihan_ganda_id) {
 					$(`#count-soal${activeCard}`).text(listCardItem + 1); // update counter soal
+
+					// update jumlah soal current card
+					$('.jumlah-soal-current').text(listCardItem + 1);
 				}
 
 				// add item to list soal
@@ -588,6 +607,16 @@ $('.simpan-jawaban-pg').click(function (e) {
 				// update csrf token
 				$('meta[name="csrf_token"]').attr('content', res.csrf_token);
 
+				// KETIKA JUMLAH SOAL SUDAH SAMA DENGAN LIMIT SOAL MAKA TUTUP MODAL
+				if (jumlahSoalCurrent+1 >= limitSoalCurrent) {
+					setTimeout(()=>{$('.btn-back').click()}, 2000);
+				}
+
+				// JIKA EDIT SOAL MAKA TUTUP MODAL
+				if (pilihan_ganda_id.value) {
+					$('.btn-back').click();
+				}
+
 			} else {
 				Swal.fire({
 					icon: 'error',
@@ -624,7 +653,11 @@ function editPilihanGanda(el) {
 
 	jenisSoalActive = 1; // set jenis soal active
 	activeCard = $(el).closest('.card-group-custom').attr('data'); // set active card
-
+	
+	countSoal = $(el).closest('.card-body').find(`#count-soal${activeCard}`).text(); // get count soal
+	// set jumlah-soal-current 
+	$('.jumlah-soal-current').text(countSoal);
+	
 	// set active question number active
 	questionNumberActive = $(el).closest('.card').find('.no-soal').text();
 

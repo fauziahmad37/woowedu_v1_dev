@@ -222,7 +222,8 @@ $(document).ready(function () {
 		let button;
 		switch(row.materi_type){
 			case 1: 
-				button = `<a href="${BASE_URL+'assets/files/materi/materi-global/'+row.materi_file}" class="btn btn-primary" target="_blank"><img src="./assets/themes/space/icons/download-icon-white.svg"></a>`;
+				// button = `<a href="${BASE_URL+'assets/files/materi/materi-global/'+row.materi_file}" class="btn btn-primary" target="_blank"><img src="./assets/themes/space/icons/download-icon-white.svg"></a>`;
+				button = `<button class="btn btn-primary" onclick="checkFileExists('${BASE_URL+'assets/files/materi/materi-global/'+row.materi_file}')"><img src="./assets/themes/space/icons/download-icon-white.svg"></button>`;
 				break;
 			case 2: 
 				button = `<a href="${row.materi_url}" class="btn btn-primary" target="_blank"><img src="./assets/themes/space/icons/link-icon-white.svg"></a>`;

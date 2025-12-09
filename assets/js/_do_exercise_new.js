@@ -61,23 +61,25 @@ $(document).ready(function () {
 
 		// jika waktu habis maka submit form
 		if (time <= 0) {
-			switch (jenisSoalActive) {
-				case "1":
-					finishMultipleChoice();
-					break;
-				case "2":
-					finishEssay();
-					break;
-				case "3":
-					finishTrueOrFalse();
-					break;
-				case "4":
-					finishFtb();
-					break;
-				default:
-					window.location.href = BASE_URL + 'asesmen';
-					break;
-			}
+
+			finishExam();
+			// switch (jenisSoalActive) {
+			// 	case "1":
+			// 		finishMultipleChoice();
+			// 		break;
+			// 	case "2":
+			// 		finishEssay();
+			// 		break;
+			// 	case "3":
+			// 		finishTrueOrFalse();
+			// 		break;
+			// 	case "4":
+			// 		finishFtb();
+			// 		break;
+			// 	default:
+			// 		window.location.href = BASE_URL + 'asesmen';
+			// 		break;
+			// }
 		}
 
 		let hours = Math.floor(time / 3600); // hitung jam
@@ -273,13 +275,10 @@ $(document).ready(function () {
 
 							const answer = [];
 							val.correct_answer.forEach(i => {
-								answer.push({ "key": i.urutan, "value": i.answer_correct });
-								if (i.answer_false) {
-									answer.push({ "key": 0, "value": i.answer_false });
-								}
+								answer.push({ "key": i.urutan, "value": i.answer,  "isOk": i.is_correct });								
 							});
 
-							val = { ...val, ...period, "question": questionTag.innerHTML, "answers": answer, "nomor": nomor, "totalSoal": soalMaster.length };
+							val = { ...val, ...period, "question": questionTag.innerHTML, "answers": getShuffledArr(answer), "nomor": nomor, "totalSoal": soalMaster.length };
 
 							setMyQuestion(document.getElementById('student-porkas-question'), val);
 						}
@@ -380,13 +379,10 @@ $(document).ready(function () {
 
 			const answer = [];
 			unanswered.correct_answer.forEach(i => {
-				answer.push({ "key": i.urutan, "value": i.answer_correct });
-				if (i.answer_false) {
-					answer.push({ "key": 0, "value": i.answer_false });
-				}
+				answer.push({ "key": i.urutan, "value": i.answer, "isOk": i.is_correct });
 			});
 
-			const input = { ...unanswered, ...period, "question": questionTag.innerHTML, "answers": answer, "nomor": nomor, "totalSoal": soalMaster.length };
+			const input = { ...unanswered, ...period, "question": questionTag.innerHTML, "answers": getShuffledArr(answer), "nomor": nomor, "totalSoal": soalMaster.length };
 
 			setMyQuestion(document.getElementById('student-porkas-question'), input);
 		}
@@ -788,6 +784,8 @@ function pairingDragStart(e) {
 	e.currentTarget.classList.add('opacity-25');
 	const target = e.target;
 
+	console.log(target);
+
 	e.dataTransfer.setData("senderID", target.id);
 }
 
@@ -869,10 +867,10 @@ function pairingDrop(e) {
 		return false;
 	}
 
-	e.target.append(document.getElementById(draggableItem));
 	e.target.querySelector("h4").classList.add('d-none');
+	e.target.append(document.getElementById(draggableItem));
 	correctAudio.play();
-
+	
 	document.getElementById(draggableItem).querySelector(".remove-dropped").classList.remove("d-none");
 	parent.classList.remove('bg-warning');
 	totalDroppedItems++;
@@ -1394,13 +1392,10 @@ function nextPage(event) {
 
 		const answer = [];
 		unanswered.correct_answer.forEach(i => {
-			answer.push({"key": i.urutan, "value": i.answer_correct });
-			if(i.answer_false) {
-				answer.push({"key": 0, "value": i.answer_false });
-			}
+			answer.push({ "key": i.urutan, "value": i.answer,  "isOk": i.is_correct });		
 		});
 
-		const input = {...unanswered, ...period,  "question": questionTag.innerHTML, "answers": answer, "nomor": nomor,  "totalSoal": soalMaster.length };
+		const input = {...unanswered, ...period,  "question": questionTag.innerHTML, "answers": getShuffledArr(answer), "nomor": nomor,  "totalSoal": soalMaster.length };
 
 
 		setMyQuestion(document.getElementById('student-porkas-question'), input);
@@ -1459,22 +1454,24 @@ function logoutExam() {
 	// play audio success
 	(new Audio(BASE_URL + "assets/audios/trumpet-success.mp3")).play();
 
-	switch (jenisSoalActive) {
-		case "1":
-			finishMultipleChoice();
-			break;
-		case "2":
-			finishEssay();
-			break;
-		case "3":
-			finishTrueOrFalse();
-			break;
-		case "4":
-			finishFtb();
-		default:
-			window.location.href = BASE_URL + "/asesmen";
-			break;
-	}
+	finishExam();
+
+	// switch (jenisSoalActive) {
+	// 	case "1":
+	// 		finishMultipleChoice();
+	// 		break;
+	// 	case "2":
+	// 		finishEssay();
+	// 		break;
+	// 	case "3":
+	// 		finishTrueOrFalse();
+	// 		break;
+	// 	case "4":
+	// 		finishFtb();
+	// 	default:
+	// 		window.location.href = BASE_URL + "/asesmen";
+	// 		break;
+	// }
 
 	// remove local storage
 	removeLocalStorage();

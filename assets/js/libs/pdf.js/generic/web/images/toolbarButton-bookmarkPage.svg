@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="toolbarButton-bookmarkPage.svg"
+   width="16"
+   height="16"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="705"
+     id="namedview6"
+     showgrid="false"
+     inkscape:zoom="5.2149125"
+     inkscape:cx="7.2123195"
+     inkscape:cy="8.4744487"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc. -->
+  <path
+     d="m 3.0249027,1.9329521 c 0,-0.7973415 0.5698708,-1.44424227 1.2722699,-1.44424227 V 1.9329521 13.769727 l 3.4483813,-2.795212 c 0.2199965,-0.18053 0.5195101,-0.18053 0.7395067,0 l 3.4457304,2.795212 V 1.9329521 H 4.2971726 V 0.48870983 h 7.6336184 c 0.702399,0 1.272269,0.64690077 1.272269,1.44424227 V 15.171846 c 0,0.270795 -0.132528,0.51752 -0.344573,0.640883 -0.212044,0.123362 -0.466499,0.1023 -0.65999,-0.05416 l -4.0845152,-3.309723 -4.084516,3.309723 c -0.1934909,0.15646 -0.447945,0.177522 -0.6599902,0.05416 C 3.157431,15.689366 3.0249027,15.442641 3.0249027,15.171846 Z"
+     id="path2"
+     inkscape:connector-curvature="0"
+     style="stroke-width:0.02824024" />
+</svg>

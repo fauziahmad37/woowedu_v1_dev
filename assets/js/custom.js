@@ -193,3 +193,17 @@ function logoutConfirm(){
 	});
 }
 	
+function checkFileExists(url) { 
+	// cek apakah file ada jika tidak ada tampilkan popup modal file tidak ditemukan
+	$.ajax({
+		url: url,
+		type: 'HEAD',
+		success: function() {
+			window.open(url, '_blank');
+		},
+		error: function() {
+			// tampilkan popup modal file tidak ditemukan
+			$('#modal-file-not-found').modal('show');
+		}
+	});
+}

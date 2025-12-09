@@ -44,6 +44,7 @@ var arrPage = [];
 			success: function (response) {
 				$('#news-content').html('');
 				$.each(response.news, function (key, value){
+					
 					let desc = value.isi;
 
 					if(desc.length > 100) desc = desc.substring(0, 100) + ' ...'
@@ -59,7 +60,7 @@ var arrPage = [];
 								<a class="text-decoration-none text-primary fw-bold" href="${BASE_URL+'news/detail/'+value.id}">Baca selengkapnya</a>
 								<br>
 								<br>
-								${buttonGroup(response.user_level, value.id)}
+								${buttonGroup(value.user_id, $('input[name="user_level"]').val(), value.id)}
 							</div>
 						</div>
 					`);
@@ -74,10 +75,10 @@ var arrPage = [];
 	}
 
 	// BUTTON GROUP EDIT & DELETE
-	function buttonGroup(user_level, id){
+	function buttonGroup(user_id, user_level, id){
 		let buttonGroup = `<a href="${BASE_URL+'news/create/'+id}" class="btn btn-clear border d-inline me-1 rounded-5"><i class="bi bi-pencil-square"></i></a>
 							<a class="btn btn-clear border d-inline rounded-5" onclick="deleteNews(${id})"><i class="bi bi-trash3-fill"></i></a>`;
-		if(user_level == 3 || user_level == 6){
+		if(user_id == $('input[name="user_id"]').val() || user_level == 6){
 			return buttonGroup;
 		}
 		return '';
