@@ -80,7 +80,7 @@ $db['default'] = array(
 	'hostname' => 'pgsql:host=localhost;port=5432;dbname=woowedu',
 	'username' => 'postgres',
 	// 'password' => 'postgroow',
-	'password' => 'Bakw4nJagung##',
+	'password' => 'postgres',
 	'database' => 'woowedu',
 	// 'dbdriver' => 'mysqli',
 	'dbdriver' => 'pdo',
