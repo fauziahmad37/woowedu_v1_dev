@@ -35,7 +35,7 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 
 assets/package-lock.json
 assets/node_modules/*
-assets/files/*
+# assets/files/*
 assets/images/ebooks/*
 # assets/libs/amcharts5/*
 # assets/libs/pdfjs-dist/*
@@ -56,23 +56,24 @@ admin/application/config/database.php
 # assets/images/ebooks/cover/e3d2d455999a8692020dac75a52f60fc.jpg
 # assets/images/ebooks/cover/e793218034c9e38137090a91c9d4a7b8.jpg
 # assets/images/ebooks/cover/f44863b3afb8feb1f2c5845c04fa5476.jpg
-admin/assets/files/tugas/KELAS 1/KELAS 1_Pembelajaran 7 
-admin/assets/files/tugas/KELAS 1/KELAS 1_Pembelajaran 7 
+# admin/assets/files/tugas/KELAS 1/KELAS 1_Pembelajaran 7 
+# admin/assets/files/tugas/KELAS 1/KELAS 1_Pembelajaran 7 
 # assets/images/users/192d6dd5c7d961a9a769ecb2760d7208.jpg
-assets/js/files/ebooks/Katolik-BG-KLS-VIII.pdf.filepart
-assets/js/files/materi/-asdsd.docx
-assets/js/files/materi/bahasa_indonesia_4-pembelajaran_9___gagasan_pokok,_gagasan_pendukung_&_ringkasan_(2).doc
-assets/js/files/materi/bahasa_indonesia_4-pembelajaran_9___gagasan_pokok,_gagasan_pendukung_&_ringkasan_(2).docx
-assets/js/files/student_task/21/4790eb457ffd5afbadfc1afb0208f007.pdf
-assets/js/files/student_task/21/76b08cdb743c43d8c2a5e5634bf95df6.pdf
-assets/js/files/student_task/21/7f989673f25a2966cb7a0dbae60ed399.pdf
-assets/js/files/student_task/21/90899c8c2a164d150f0c51ba9672f921.docx
-assets/js/files/student_task/21/99d70e5a514d8ca68ebdc0f6827c40fb.docx
-assets/js/files/student_task/556393-1673348362.pdf
-assets/libs/pdf.js/generic-legacy/web/viewer.html
-assets/files/*
-*.png
-admin/assets/files/soal/KWKDM6KQ0R/KWKDM6KQ0R_a.jpeg
-admin/assets/files/*
-/admin/assets/files/soal/KWKDM6KQ0R
+# assets/js/files/ebooks/Katolik-BG-KLS-VIII.pdf.filepart
+# assets/js/files/materi/-asdsd.docx
+# assets/js/files/materi/bahasa_indonesia_4-pembelajaran_9___gagasan_pokok,_gagasan_pendukung_&_ringkasan_(2).doc
+# assets/js/files/materi/bahasa_indonesia_4-pembelajaran_9___gagasan_pokok,_gagasan_pendukung_&_ringkasan_(2).docx
+# assets/js/files/student_task/21/4790eb457ffd5afbadfc1afb0208f007.pdf
+# assets/js/files/student_task/21/76b08cdb743c43d8c2a5e5634bf95df6.pdf
+# assets/js/files/student_task/21/7f989673f25a2966cb7a0dbae60ed399.pdf
+# assets/js/files/student_task/21/90899c8c2a164d150f0c51ba9672f921.docx
+# assets/js/files/student_task/21/99d70e5a514d8ca68ebdc0f6827c40fb.docx
+# assets/js/files/student_task/556393-1673348362.pdf
+# assets/libs/pdf.js/generic-legacy/web/viewer.html
+# assets/files/*
+# *.png
+# admin/assets/files/soal/KWKDM6KQ0R/KWKDM6KQ0R_a.jpeg
+# admin/assets/files/*
+# /admin/assets/files/soal/KWKDM6KQ0R
 admin/vendor/
+admin/assets/libs/tinymce/*
