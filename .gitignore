@@ -47,18 +47,18 @@ assets/images/ebooks/*
 admin/application/config/database.php
 /admin/application/logs/*
 /admin/application/session/*
-assets/images/ebooks/cover/17c43f42bb1521bc52590e388ca165e7.jpg
-assets/images/ebooks/cover/4d9748469310a6bbe70c0b5abcc26708.jpg
-assets/images/ebooks/cover/910ffbfdd4046052fefabf87b0cd72bf.jpg
-assets/images/ebooks/cover/9b0b91b330b385c8b6e839c3a82227b4.jpg
-assets/images/ebooks/cover/9d5696687123b86352ea7c76bbbf8bc9.jpg
-assets/images/ebooks/cover/a06f3b7325d868c1134edc5e4cc36048.jpg
-assets/images/ebooks/cover/e3d2d455999a8692020dac75a52f60fc.jpg
-assets/images/ebooks/cover/e793218034c9e38137090a91c9d4a7b8.jpg
-assets/images/ebooks/cover/f44863b3afb8feb1f2c5845c04fa5476.jpg
+# assets/images/ebooks/cover/17c43f42bb1521bc52590e388ca165e7.jpg
+# assets/images/ebooks/cover/4d9748469310a6bbe70c0b5abcc26708.jpg
+# assets/images/ebooks/cover/910ffbfdd4046052fefabf87b0cd72bf.jpg
+# assets/images/ebooks/cover/9b0b91b330b385c8b6e839c3a82227b4.jpg
+# assets/images/ebooks/cover/9d5696687123b86352ea7c76bbbf8bc9.jpg
+# assets/images/ebooks/cover/a06f3b7325d868c1134edc5e4cc36048.jpg
+# assets/images/ebooks/cover/e3d2d455999a8692020dac75a52f60fc.jpg
+# assets/images/ebooks/cover/e793218034c9e38137090a91c9d4a7b8.jpg
+# assets/images/ebooks/cover/f44863b3afb8feb1f2c5845c04fa5476.jpg
 admin/assets/files/tugas/KELAS 1/KELAS 1_Pembelajaran 7 
 admin/assets/files/tugas/KELAS 1/KELAS 1_Pembelajaran 7 
-assets/images/users/192d6dd5c7d961a9a769ecb2760d7208.jpg
+# assets/images/users/192d6dd5c7d961a9a769ecb2760d7208.jpg
 assets/js/files/ebooks/Katolik-BG-KLS-VIII.pdf.filepart
 assets/js/files/materi/-asdsd.docx
 assets/js/files/materi/bahasa_indonesia_4-pembelajaran_9___gagasan_pokok,_gagasan_pendukung_&_ringkasan_(2).doc
