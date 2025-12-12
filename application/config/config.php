@@ -475,7 +475,7 @@ $config['csrf_exclude_uris'] = array("materi/delete", "asesmen/save", "asesmen/s
 	"asesmen_standard/delete_response_jawaban_pilihan_ganda", "asesmen_standard/get_student_collect",
 	"asesmen_standard/get_soal_exam", "soal/get_detail_soal", "asesmen_standard/finish_exam",
 	"soal/get_soal_exam", "asesmen_standard/create_dragdrop_question", "asesmen_standard/save_point_essay",
-	"asesmen_standard/create_pairing_question", "api/Api_ebook/checkout", "api/Api_ebook/makePayment"
+	"asesmen_standard/create_pairing_question", "api/Api_ebook/checkout", "api/Api_ebook/makePayment", "Asesmen_standard/save_pilihan_ganda"
 	);
 
 /*
