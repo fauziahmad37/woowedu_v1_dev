@@ -19,7 +19,8 @@
 	let badgeDiscount = document.querySelector('.badge-discount');
 	let ebookPrice = document.getElementById('ebook_price');
 	let hargaCoret = document.querySelector('.harga-coret');
-
+	let publisherId = document.getElementById('publisher_id');
+	
     // create read more
     const descContent = document.querySelector('.desc-content'),
           openContent = document.getElementById('open-content'),
@@ -80,6 +81,17 @@
 					if (response.status === true) {
 						let data = response.data;
 
+						// ============== UNTUK TESTING SAJA =================
+
+						if (data.publisher_id == 12) {
+							// hide beli_sekarang button
+							document.getElementById('beli_sekarang').classList.add('d-none');
+							// show baca_buku button
+							document.getElementById('baca_buku').classList.remove('d-none');
+						}
+
+						// ==================================================
+						
 						// Update the page with the ebook details
 						thumbnailMain.alt = data.title;
 						thumbnailMain.src = data.cover_img.includes('http') ? data.cover_img :  BASE_URL + 'assets/images/ebooks/cover/' + data.cover_img;
@@ -89,6 +101,7 @@
 						thumbnailSelect4Img.src = data.cover_3 ? data.cover_3 : BASE_URL + 'assets/images/images-placeholder.png';
 						publisherName[0].innerText = data.publisher.publisher_name;
 						publisherName[1].innerText = data.publisher.publisher_name;
+						publisherId.value = data.publisher.id;
 						ebookTitle.innerText = data.title;
 						isbn.innerText = data.isbn;
 						totalPages.innerText = data.total_pages;
@@ -690,6 +703,11 @@
 	$('.thumbnail-select').on('click', (e) => {
 		let img = (e.currentTarget.src)
 		$('#thumbnail-main').attr('src', img)
+	});
+	
+	// ========================= BACA BUKU DI KLIK =========================
+	$('#baca_buku').on('click', (e) => {
+		window.location.href = 'api/Api_ebook/getDetailEbookErlangga?ebook_id=' + ebookId;
 	});
 </script>
 
