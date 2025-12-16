@@ -861,4 +861,13 @@ class Api_ebook extends MY_Controller
 		header('Content-Type: application/json');
 		echo json_encode($res);
 	}
+
+	function getDetailEbookErlangga(): void {
+		$get = $this->input->get();
+		$ebook_id = isset($get['ebook_id']) ? $get['ebook_id'] : '';
+
+		$data = $this->db->get_where('ebooks', ['id' => $ebook_id])->row_array();
+
+		redirect($data['file_1']);
+	}
 }
