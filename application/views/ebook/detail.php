@@ -72,6 +72,7 @@
 <section class="explore-section section-padding container" id="section_2">
 
 	<input type="hidden" id="ebook_id" value="<?= $ebook_id ?>" />
+	<input type="hidden" id="publisher_id" />
 
 	<script id="ebook-detail" type="application/json">
 		<?= json_encode($book) ?>
@@ -147,7 +148,8 @@
 					<?//php if ($ebook_member) : ?>
 						<!-- <a href="<?//= html_escape(base_url('ebook/open_book?id=' . $book['id'])) ?>" class="btn btn-lg btn-primary w-100">Baca Ebook</a> -->
 					<?//php else : ?>
-						<a href="<?= html_escape(base_url('ebook/paket?book_no=' . $ebook_id)) ?>" class="btn btn-lg btn-primary w-100">Beli Sekarang</a>
+						<a href="<?= html_escape(base_url('ebook/paket?book_no=' . $ebook_id)) ?>" class="btn btn-lg btn-primary w-100" id="beli_sekarang">Beli Sekarang</a>
+						<button id="baca_buku" class="btn btn-lg btn-primary w-100 d-none">Baca Buku</button>
 					<?//php endif ?>
 				</div>
 				<div class="col-xs-12 col-md-4 col-lg-3 mt-sm-0 mt-xs-2">
